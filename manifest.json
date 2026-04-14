@@ -11,7 +11,7 @@
   ],
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "메이플 북마크 추가기",
+    "default_title": "메이플 아이템 ocr 분석 및 추가",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
