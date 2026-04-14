@@ -36,6 +36,7 @@ body {
   font-size: 12px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+  zoom: 1.15;
 }
 
 body::-webkit-scrollbar { width: 4px; }
