@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "메이플 북마크 추가기 with gemini",
+  "version": "1.0.1",
+  "description": "maplescouter.com의 equipBookmarkList에 아이템을 추가합니다.",
+  "permissions": ["storage", "scripting", "activeTab", "tabs"],
+  "host_permissions": [
+    "https://maplescouter.com/*",
+    "http://maplescouter.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "메이플 북마크 추가기",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>메이플 북마크 추가기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-icon">⚔️</div>
+      <div>
+        <h1 class="title">메이플 북마크</h1>
+        <p class="subtitle">AI 스크린샷 분석기 (Gemini)</p>
+      </div>
+    </header>
+
+    <div class="status-bar" id="statusBar">
+      <span id="statusText">maplescouter.com에 접속해주세요</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="ocr">📷 스크린샷 분석(OCR)</button>
+      <button class="tab" data-tab="list">북마크 목록</button>
+    </div>
+
+    <div class="tab-content active" id="tab-ocr">
+
+      <div class="section-title">Gemini 무료 API 설정</div>
+      <div class="form-group">
+        <label>API 키 <span class="required">*</span> <span style="color:var(--text-muted);font-weight:400">(aistudio.google.com)</span></label>
+        <div class="api-key-row">
+          <input type="password" id="visionApiKey" placeholder="AIzaSy..." autocomplete="off" />
+          <button class="btn-small" id="btnSaveKey">저장</button>
+        </div>
+        <span class="api-key-status" id="apiKeyStatus"></span>
+      </div>
+
+      <div class="section-title" style="margin-top:12px">사용 모델 선택</div>
+      <div class="model-selector">
+        <label class="model-option">
+          <input type="radio" name="modelSelection" value="gemini-2.5-flash" checked>
+          <div class="model-info">
+            <div class="model-name">
+              Gemini 2.5 Flash 
+              <span class="quota-badge" id="quota-25">계산 중...</span>
+            </div>
+            <div class="model-desc">비상용 (분당 5회 / 하루 20회 제한)</div>
+          </div>
+        </label>
+        <label class="model-option">
+          <input type="radio" name="modelSelection" value="gemini-3.1-flash-lite-preview">
+          <div class="model-info">
+            <div class="model-name">
+              Gemini 3.1 Flash-Lite
+              <span class="quota-badge" id="quota-31">계산 중...</span>
+            </div>
+            <div class="model-desc">빠르고 넉넉함 (분당 15회 / 하루 500회 제한)</div>
+            <div class="model-warning">⚠️ 서버 혼잡 시 일시적 오류가 발생할 수 있음</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="section-title" style="margin-top:12px">아이템 스크린샷</div>
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">🖼️</div>
+        <div class="drop-text">윈도우 캡처(Win+Shift+S) 후<br/>여기를 클릭하고 Ctrl+V (붙여넣기)</div>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" />
+      </div>
+
+      <div class="ocr-preview-wrap" id="ocrPreviewWrap" style="display:none">
+        <img id="ocrPreview" class="ocr-preview" alt="미리보기" />
+        <button class="btn-small ocr-clear" id="btnClearImage">✕ 초기화</button>
+      </div>
+
+      <button class="btn-ocr" id="btnRunOcr" disabled>🔍 AI로 아이템 옵션 읽기</button>
+      <div class="ocr-status" id="ocrStatus" style="display:none"></div>
+
+      <div id="ocrResult" style="display:none">
+        <div class="section-title" style="margin-top:12px">
+          파싱 결과 확인
+          <span class="total-preview-label">수정 후 추가 가능</span>
+        </div>
+        <div class="ocr-parsed-grid" id="ocrParsedGrid"></div>
+        
+        <div class="action-row">
+          <button class="btn-submit" id="btnOcrSubmit">📌 북마크에 추가</button>
+          <button class="btn-secondary" id="btnResetState">🔄 초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-list">
+      <div class="list-header">
+        <span id="bookmarkCount">로딩 중...</span>
+        <button class="btn-small" id="btnRefresh">🔄 새로고침</button>
+      </div>
+      <div id="bookmarkList" class="bookmark-list"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
