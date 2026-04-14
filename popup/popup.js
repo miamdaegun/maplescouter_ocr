@@ -1,5 +1,3 @@
-// popup/popup.js
-
 // ─── 탭 전환 ─────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach((tab) => {
   tab.addEventListener('click', () => {
