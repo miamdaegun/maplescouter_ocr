@@ -21,7 +21,7 @@
 
 ## 사용 방법
 
-1. **[maplescouter.com](https://maplescouter.com/ko/item)** 에 접속합니다.
+1. **https://maplescouter.com/ko/item** 에 접속합니다.
 2. 브라우저 우측 상단 확장 프로그램 아이콘을 클릭합니다.
 3. 최초 1회 **Gemini API 키**를 입력하고 저장합니다. ([aistudio.google.com](https://aistudio.google.com)에서 무료 발급)
 4. 사용할 **모델**을 선택합니다.
