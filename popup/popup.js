@@ -488,7 +488,9 @@ async function runGeminiVision(base64Image, mediaType, apiKey) {
     const err = await response.json();
     let msg = err.error?.message || `HTTP ${response.status}`;
     if (msg.includes("experiencing high demand")) {
-      msg = "현재 서버가 너무 혼잡합니다. 잠시 후 다시 시도하거나 2.5 Flash 모델을 사용해 보세요.";
+      msg = selectedModel === 'gemini-2.5-flash'
+        ? "현재 서버가 너무 혼잡합니다. 잠시 후 다시 시도해주세요."
+        : "현재 서버가 너무 혼잡합니다. 잠시 후 다시 시도하거나 2.5 Flash 모델을 사용해 보세요.";
     }
     throw new Error(msg);
   }
