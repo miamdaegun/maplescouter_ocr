@@ -157,22 +157,36 @@ const MAX_QUOTA = {
   'gemini-3.1-flash-lite-preview': 500
 };
 
+function getKeyId() {
+  const key = localStorage.getItem('maple_gemini_api_key') || '';
+  return key ? key.slice(-8) : 'nokey';
+}
+
+function quotaKey(model) {
+  const id = getKeyId();
+  return model === 'gemini-2.5-flash' ? `maple_quota_${id}_25` : `maple_quota_${id}_31`;
+}
+
+function quotaDateKey() {
+  return `maple_quota_${getKeyId()}_date`;
+}
+
 function initAndCheckQuota() {
   const today = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul' }).format(new Date());
-  const storedDate = localStorage.getItem('maple_quota_date');
-  
+  const storedDate = localStorage.getItem(quotaDateKey());
+
   if (storedDate !== today) {
-    localStorage.setItem('maple_quota_date', today);
-    localStorage.setItem('maple_quota_25', '0');
-    localStorage.setItem('maple_quota_31', '0');
+    localStorage.setItem(quotaDateKey(), today);
+    localStorage.setItem(quotaKey('gemini-2.5-flash'), '0');
+    localStorage.setItem(quotaKey('gemini-3.1-flash-lite-preview'), '0');
   }
   updateQuotaUI();
 }
 
 function updateQuotaUI() {
-  const used25 = parseInt(localStorage.getItem('maple_quota_25') || '0');
-  const used31 = parseInt(localStorage.getItem('maple_quota_31') || '0');
-  
+  const used25 = parseInt(localStorage.getItem(quotaKey('gemini-2.5-flash')) || '0');
+  const used31 = parseInt(localStorage.getItem(quotaKey('gemini-3.1-flash-lite-preview')) || '0');
+
   const remain25 = Math.max(0, MAX_QUOTA['gemini-2.5-flash'] - used25);
   const remain31 = Math.max(0, MAX_QUOTA['gemini-3.1-flash-lite-preview'] - used31);
 
@@ -190,13 +204,9 @@ function updateQuotaUI() {
 }
 
 function increaseUsedQuota(modelName) {
-  if (modelName === 'gemini-2.5-flash') {
-    const current = parseInt(localStorage.getItem('maple_quota_25') || '0');
-    localStorage.setItem('maple_quota_25', current + 1);
-  } else {
-    const current = parseInt(localStorage.getItem('maple_quota_31') || '0');
-    localStorage.setItem('maple_quota_31', current + 1);
-  }
+  const k = quotaKey(modelName);
+  const current = parseInt(localStorage.getItem(k) || '0');
+  localStorage.setItem(k, current + 1);
   updateQuotaUI();
 }
 
@@ -232,19 +242,9 @@ document.getElementById('btnSaveKey')?.addEventListener('click', () => {
   if (!key) { setApiKeyStatus('키를 입력해주세요', 'err'); return; }
   if (!key.startsWith('AIza')) { setApiKeyStatus('⚠ 형식이 올바르지 않습니다 (AIza...)', 'err'); return; }
   
-  const oldKey = localStorage.getItem('maple_gemini_api_key');
-  
-  // 입력한 키가 기존 저장된 키와 다르다면 할당량 사용 기록을 완전히 초기화
-  if (oldKey !== key) {
-    localStorage.setItem('maple_quota_25', '0');
-    localStorage.setItem('maple_quota_31', '0');
-  }
-
   localStorage.setItem('maple_gemini_api_key', key);
-  setApiKeyStatus('✓ 저장 완료 (할당량 갱신됨)', 'ok');
-  
-  // UI 즉시 업데이트
-  updateQuotaUI();
+  setApiKeyStatus('✓ 저장 완료', 'ok');
+  initAndCheckQuota();
 });
 
 document.querySelectorAll('input[name="modelSelection"]').forEach(radio => {
