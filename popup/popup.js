@@ -266,6 +266,7 @@ function loadSavedOcrState() {
         currentImageBase64 = state.image;
         currentImageMediaType = state.mediaType || 'image/png';
 
+        chrome.storage.session.set({ ocr_preview_image: `data:${currentImageMediaType};base64,${currentImageBase64}` });
         document.getElementById('ocrPreview').src = `data:${currentImageMediaType};base64,${currentImageBase64}`;
         document.getElementById('ocrPreviewWrap').style.display = 'block';
         document.getElementById('dropZone').style.display = 'none';
@@ -314,8 +315,39 @@ function saveCurrentOcrState() {
   localStorage.setItem('maple_ocr_state', JSON.stringify(state));
 }
 
+let viewerWindowId = null;
+
+function openViewerWindow() {
+  if (viewerWindowId !== null) {
+    chrome.windows.remove(viewerWindowId, () => { if (chrome.runtime.lastError) {} });
+    viewerWindowId = null;
+  }
+  chrome.windows.create({
+    url: chrome.runtime.getURL('popup/viewer.html'),
+    type: 'popup',
+    width: 520,
+    height: 820
+  }, (win) => { viewerWindowId = win.id; });
+}
+
+function closeViewerWindow() {
+  if (viewerWindowId !== null) {
+    chrome.windows.remove(viewerWindowId, () => { if (chrome.runtime.lastError) {} });
+    viewerWindowId = null;
+  }
+}
+
 document.getElementById('btnClearImage')?.addEventListener('click', clearOcrState);
 document.getElementById('btnResetState')?.addEventListener('click', () => { clearOcrState(); showToast('상태가 깔끔하게 초기화되었습니다.', 'success'); });
+document.getElementById('btnOpenViewer')?.addEventListener('click', openViewerWindow);
+
+const chkAutoViewer = document.getElementById('chkAutoViewer');
+if (chkAutoViewer) {
+  chkAutoViewer.checked = localStorage.getItem('maple_auto_viewer') === 'true';
+  chkAutoViewer.addEventListener('change', () => {
+    localStorage.setItem('maple_auto_viewer', chkAutoViewer.checked);
+  });
+}
 document.getElementById('ocrParsedGrid')?.addEventListener('input', saveCurrentOcrState);
 
 function setImage(file) {
@@ -493,7 +525,7 @@ function renderOcrResult(parsed) {
   const hasExceptional = ['str','dex','int','luk','max_hp','max_mp','attack_power','magic_power'].some(k => parseInt(ex[k]) > 0);
 
   const sections = [
-    sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), field('세부 명칭', parsed.part ?? '', 'part'), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), field('소울 이름', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option'),
+    sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), field('세부 명칭', parsed.part ?? '', 'part'), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), field('소울 등급', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option'),
     sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statField('최대HP', 'max_hp'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statField('올스탯', 'all_stat'), statField('보공%', 'boss_damage'), statField('데미지%', 'damage'), statField('방무%', 'ignore_monster_armor'), statField('방어력', 'armor'), statField('HP%', 'max_hp_rate'),
     ...(hasPotential ? [sectionHead('잠재능력'), field('잠재 등급', parsed.potential_grade, 'potential_grade'), field('잠재 1', parsed.potential_option_1?.[0], 'pot1'), field('잠재 2', parsed.potential_option_1?.[1], 'pot2'), field('잠재 3', parsed.potential_option_1?.[2], 'pot3')] : []),
     ...(hasAdditional ? [sectionHead('에디셔널 잠재능력'), field('에디 등급', parsed.additional_potential_grade, 'additional_potential_grade'), field('에디 1', parsed.additional_potential_option_1?.[0], 'add1'), field('에디 2', parsed.additional_potential_option_1?.[1], 'add2'), field('에디 3', parsed.additional_potential_option_1?.[2], 'add3')] : []),
@@ -548,7 +580,10 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
     renderOcrResult(parsed);
     saveCurrentOcrState();
     trackApiCall();
-    
+
+    chrome.storage.session.set({ ocr_preview_image: `data:${currentImageMediaType};base64,${currentImageBase64}` });
+    if (localStorage.getItem('maple_auto_viewer') === 'true') openViewerWindow();
+
   } catch (e) {
     statusEl.className = 'ocr-status err';
     statusEl.textContent = '✗ 오류: ' + e.message;
@@ -566,7 +601,7 @@ document.getElementById('btnOcrSubmit')?.addEventListener('click', async () => {
     if (!item.slot) throw new Error('부위가 없습니다.');
     const res = await addBookmarkToPage(item);
     
-    if (res.success) { showToast(res.message, 'success'); } 
+    if (res.success) { showToast(res.message, 'success'); closeViewerWindow(); } 
     else { showToast(res.message, 'error'); }
   } catch (e) {
     showToast(e.message, 'error');
