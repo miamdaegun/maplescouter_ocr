@@ -26,7 +26,9 @@
 2. 브라우저 우측 상단 확장 프로그램 아이콘을 클릭합니다.
 3. 최초 1회 **Gemini API 키**를 입력하고 저장합니다. ([aistudio.google.com](https://aistudio.google.com)에서 무료 발급)
 4. 좌하단의 get API key 클릭 후 API Key 복사 (API Key가 없다면 해당 페이지에서 API 키 만들기 클릭)
-5. 사용할 **모델**을 선택합니다.
+5. 그 후 주소창 오른쪽의 해당 아이콘 클릭 후 프로그램 실행, 사용할 **모델**을 선택합니다.
+<img src=icons\test3.png>
+
 6. 아이템 툴팁 스크린샷을 준비합니다. (Win+Shift+S 캡처 후 Ctrl+V 붙여넣기 또는 파일 드래그)
 7. **AI로 아이템 옵션 읽기** 버튼을 클릭합니다. 이미지 양식은 다음과 같습니다. 네모박스에 정확히 딱 맞게 스크린샷을 찍으면 됩니다.
 <img src=icons\test.png>
