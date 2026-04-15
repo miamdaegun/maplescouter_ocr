@@ -1,3 +1,29 @@
+// ─── Firebase 사용량 카운터 ────────────────────────────────
+const FIREBASE_PROJECT = 'maplescouter-ocr';
+const COUNTER_DOC = `projects/${FIREBASE_PROJECT}/databases/(default)/documents/stats/counter`;
+
+async function trackApiCall() {
+  try {
+    await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:commit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        writes: [{
+          transform: {
+            document: COUNTER_DOC,
+            fieldTransforms: [{
+              fieldPath: 'count',
+              increment: { integerValue: '1' }
+            }]
+          }
+        }]
+      })
+    });
+  } catch (_) {
+    // 카운팅 실패는 사용자 경험에 영향 없이 무시
+  }
+}
+
 // ─── 탭 전환 ─────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach((tab) => {
   tab.addEventListener('click', () => {
@@ -513,6 +539,7 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
     
     renderOcrResult(parsed);
     saveCurrentOcrState();
+    trackApiCall();
     
   } catch (e) {
     statusEl.className = 'ocr-status err';
