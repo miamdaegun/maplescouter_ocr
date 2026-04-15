@@ -304,7 +304,7 @@ function saveCurrentOcrState() {
     image: currentImageBase64,
     mediaType: currentImageMediaType,
     parsed: {
-      name: data['name'], slot: data['slot'], part: data['part'], base_equipment_level: data['base_equipment_level'], scroll_upgrade: data['scroll_upgrade'], soul_option: data['soul_option'] || null,
+      name: data['name'], slot: data['slot'], part: data['part'], base_equipment_level: data['base_equipment_level'], scroll_upgrade: data['scroll_upgrade'], soul_name: data['soul_name'] || null, soul_option: data['soul_option'] || null,
       totalOption: { str: data['total_str'], dex: data['total_dex'], int: data['total_int'], luk: data['total_luk'], max_hp: data['total_max_hp'], attack_power: data['total_attack_power'], magic_power: data['total_magic_power'], all_stat: data['total_all_stat'], boss_damage: data['total_boss_damage'], damage: data['total_damage'], ignore_monster_armor: data['total_ignore_monster_armor'], armor: data['total_armor'], max_hp_rate: data['total_max_hp_rate'] },
       potential_grade: data['potential_grade'], potential_option_1: [data['pot1'], data['pot2'], data['pot3']],
       additional_potential_grade: data['additional_potential_grade'], additional_potential_option_1: [data['add1'], data['add2'], data['add3']],
@@ -357,7 +357,7 @@ const GEMINI_PROMPT = `
 6. 아이템 이름(name)을 추출할 때, 이름 바로 위에 작게 적힌 제작자/유저 닉네임(예: '~~의')은 절대 포함하지 마세요. 오직 가장 크고 굵은 글씨로 적힌 실제 장비 본명만 추출하세요. (예: "데티의 불멸의 유산" -> "불멸의 유산")
 7. 아이템의 slot이 '보조무기' 인 경우 part 에도 보조무기라고 적지 말고 보조무기 옆의 브레이슬릿, 로자리오, 무게추, 메달 등 세부 명칭을 part에 적으세요.
 8. 아이템의 slot이 '무기'인 경우 part에는 3번째 항목인 스태프, 두손검, 아대, 튜너 등 세뷰 명칭을 part에 적으세요. 두번째 항목인 한손, 두손은 무시하면 됩니다.
-8-1. 아이템이 slot이 '무기' 이고 최하단에 소울이 존재한다면 soul_option에 해당 내용을 작성하세요. soul_name은 무시하셔도 됩니다.
+8-1. 아이템이 slot이 '무기' 이고 최하단에 소울이 존재한다면 soul_name에 소울 이름(예: "위대한 블리디퀀의 소울", "경이로운 카링의 소울" 등 이미지에 표시된 그대로)을, soul_option에 효과를 작성하세요.
 8-2. soul_option은 아래 목록 중 이미지에서 읽은 내용과 가장 일치하는 것을 정확히 그대로 출력하세요. 목록에 없는 표현은 절대 사용하지 마세요.
     유효한 soul_option 목록:
     "공격력 +3%"
@@ -493,7 +493,7 @@ function renderOcrResult(parsed) {
   const hasExceptional = ['str','dex','int','luk','max_hp','max_mp','attack_power','magic_power'].some(k => parseInt(ex[k]) > 0);
 
   const sections = [
-    sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), field('세부 명칭', parsed.part ?? '', 'part'), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option'),
+    sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), field('세부 명칭', parsed.part ?? '', 'part'), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), field('소울 이름', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option'),
     sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statField('최대HP', 'max_hp'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statField('올스탯', 'all_stat'), statField('보공%', 'boss_damage'), statField('데미지%', 'damage'), statField('방무%', 'ignore_monster_armor'), statField('방어력', 'armor'), statField('HP%', 'max_hp_rate'),
     ...(hasPotential ? [sectionHead('잠재능력'), field('잠재 등급', parsed.potential_grade, 'potential_grade'), field('잠재 1', parsed.potential_option_1?.[0], 'pot1'), field('잠재 2', parsed.potential_option_1?.[1], 'pot2'), field('잠재 3', parsed.potential_option_1?.[2], 'pot3')] : []),
     ...(hasAdditional ? [sectionHead('에디셔널 잠재능력'), field('에디 등급', parsed.additional_potential_grade, 'additional_potential_grade'), field('에디 1', parsed.additional_potential_option_1?.[0], 'add1'), field('에디 2', parsed.additional_potential_option_1?.[1], 'add2'), field('에디 3', parsed.additional_potential_option_1?.[2], 'add3')] : []),
@@ -522,7 +522,7 @@ function buildItemFromOcrResult() {
     potential_grade: data['potential_grade'] || '', potential_option_1: [data['pot1']||'', data['pot2']||'', data['pot3']||''], additional_potential_grade: data['additional_potential_grade'] || '', additional_potential_option_1: [data['add1']||'', data['add2']||'', data['add3']||''],
     exceptionalOption: { str: getN('ex_str'), dex: getN('ex_dex'), int: getN('ex_int'), luk: getN('ex_luk'), max_hp: getN('ex_max_hp'), max_mp: getN('ex_max_mp'), attack_power: getN('ex_attack_power'), magic_power: getN('ex_magic_power'), exceptional_upgrade: parseInt(data['ex_upgrade'] || '0') || 0 },
     hasExceptional: (parseInt(data['ex_str']) > 0 || parseInt(data['ex_dex']) > 0 || parseInt(data['ex_int']) > 0 || parseInt(data['ex_luk']) > 0 || parseInt(data['ex_max_hp']) > 0 || parseInt(data['ex_attack_power']) > 0 || parseInt(data['ex_magic_power']) > 0),
-    soul_name: soulOption ? '소울 장착' : null, soul_option: soulOption, ring_level: 0, itemScore: '0', character_name: 'Unknown', class_group: '전사', cuttable_count: '255', title: '', bookMark: true, base_equipment_level: baseEqLevel,
+    soul_name: data['soul_name'] || null, soul_option: soulOption, ring_level: 0, itemScore: '0', character_name: 'ocr' + new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\D/g, ''), class_group: '전사', cuttable_count: '255', title: '', bookMark: true, base_equipment_level: baseEqLevel,
   };
 }
 
