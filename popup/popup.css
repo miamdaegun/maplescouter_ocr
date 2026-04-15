@@ -387,6 +387,21 @@ input::placeholder { color: var(--text-muted); opacity: 0.6; }
   font-family: var(--font); padding: 0;
 }
 .ocr-field-value:focus { color: var(--accent); }
+
+.ocr-field-select {
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%237a80a0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  padding-right: 20px;
+}
+
+.ocr-field-select option {
+  color: #000;
+  background: #fff;
+}
 .ocr-section-head {
   font-size: 10px; font-weight: 700; color: var(--accent);
   padding: 6px 0 2px 0; border-bottom: 1px solid var(--border); margin-top: 2px;

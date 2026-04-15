@@ -516,6 +516,11 @@ function renderOcrResult(parsed) {
 
   const field = (label, value, key) => `<div class="ocr-field"><span class="ocr-field-label">${label}</span><input class="ocr-field-value" data-key="${key}" value="${String(value ?? '')}" /></div>`;
   const sectionHead = (title) => `<div class="ocr-section-head">${title}</div>`;
+  const GRADE_OPTIONS = ['', '레어', '에픽', '유니크', '레전드리'];
+  const gradeSelect = (label, value, key) => {
+    const opts = GRADE_OPTIONS.map(g => `<option value="${g}"${g === (value || '') ? ' selected' : ''}>${g || '없음'}</option>`).join('');
+    return `<div class="ocr-field"><span class="ocr-field-label">${label}</span><select class="ocr-field-value ocr-field-select" data-key="${key}">${opts}</select></div>`;
+  };
   const t = parsed.totalOption || {};
   const statField = (label, statKey) => field(label, t[statKey] ?? '0', `total_${statKey}`);
 
@@ -527,8 +532,8 @@ function renderOcrResult(parsed) {
   const sections = [
     sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), field('세부 명칭', parsed.part ?? '', 'part'), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), field('소울 등급', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option'),
     sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statField('최대HP', 'max_hp'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statField('올스탯', 'all_stat'), statField('보공%', 'boss_damage'), statField('데미지%', 'damage'), statField('방무%', 'ignore_monster_armor'), statField('방어력', 'armor'), statField('HP%', 'max_hp_rate'),
-    ...(hasPotential ? [sectionHead('잠재능력'), field('잠재 등급', parsed.potential_grade, 'potential_grade'), field('잠재 1', parsed.potential_option_1?.[0], 'pot1'), field('잠재 2', parsed.potential_option_1?.[1], 'pot2'), field('잠재 3', parsed.potential_option_1?.[2], 'pot3')] : []),
-    ...(hasAdditional ? [sectionHead('에디셔널 잠재능력'), field('에디 등급', parsed.additional_potential_grade, 'additional_potential_grade'), field('에디 1', parsed.additional_potential_option_1?.[0], 'add1'), field('에디 2', parsed.additional_potential_option_1?.[1], 'add2'), field('에디 3', parsed.additional_potential_option_1?.[2], 'add3')] : []),
+    ...(hasPotential ? [sectionHead('잠재능력'), gradeSelect('잠재 등급', parsed.potential_grade, 'potential_grade'), field('잠재 1', parsed.potential_option_1?.[0], 'pot1'), field('잠재 2', parsed.potential_option_1?.[1], 'pot2'), field('잠재 3', parsed.potential_option_1?.[2], 'pot3')] : []),
+    ...(hasAdditional ? [sectionHead('에디셔널 잠재능력'), gradeSelect('에디 등급', parsed.additional_potential_grade, 'additional_potential_grade'), field('에디 1', parsed.additional_potential_option_1?.[0], 'add1'), field('에디 2', parsed.additional_potential_option_1?.[1], 'add2'), field('에디 3', parsed.additional_potential_option_1?.[2], 'add3')] : []),
     ...(hasExceptional ? [sectionHead('익셉셔널 옵션'), field('STR', ex.str ?? '0', 'ex_str'), field('DEX', ex.dex ?? '0', 'ex_dex'), field('INT', ex.int ?? '0', 'ex_int'), field('LUK', ex.luk ?? '0', 'ex_luk'), field('최대HP', ex.max_hp ?? '0', 'ex_max_hp'), field('최대MP', ex.max_mp ?? '0', 'ex_max_mp'), field('공격력', ex.attack_power ?? '0', 'ex_attack_power'), field('마력', ex.magic_power ?? '0', 'ex_magic_power'), field('강화횟수', ex.exceptional_upgrade ?? 0, 'ex_upgrade')] : []),
   ];
 
