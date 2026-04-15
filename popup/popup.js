@@ -299,7 +299,7 @@ function saveCurrentOcrState() {
   if (document.getElementById('ocrResult').style.display === 'none') return;
   const grid = document.getElementById('ocrParsedGrid');
   const data = {};
-  grid.querySelectorAll('input[data-key]').forEach(el => { data[el.dataset.key] = el.value.trim(); });
+  grid.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = el.value.trim(); });
   
   const state = {
     image: currentImageBase64,
@@ -543,7 +543,7 @@ function renderOcrResult(parsed) {
 
 function buildItemFromOcrResult() {
   const grid = document.getElementById('ocrParsedGrid');
-  const data = {}; grid.querySelectorAll('input[data-key]').forEach(el => { data[el.dataset.key] = el.value.trim(); });
+  const data = {}; grid.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = el.value.trim(); });
   const getN = (k) => String(parseInt(data[k]) || 0);
 
   const baseEqLevel = parseInt(data['base_equipment_level']) || 0;
