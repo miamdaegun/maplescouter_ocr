@@ -227,7 +227,6 @@ function setApiKeyStatus(msg, type) {
   el.className = `api-key-status ${type}`;
 }
 
-// 🔥 핵심 변경 부분: 키가 달라지면 할당량을 리셋합니다 🔥
 document.getElementById('btnSaveKey')?.addEventListener('click', () => {
   const key = document.getElementById('visionApiKey').value.trim();
   if (!key) { setApiKeyStatus('키를 입력해주세요', 'err'); return; }
