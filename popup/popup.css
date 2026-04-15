@@ -74,6 +74,25 @@ body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 .header-icon { font-size: 24px; }
 
+.btn-github {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-github:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
 .title {
   font-size: 15px;
   font-weight: 700;
