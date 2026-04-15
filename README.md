@@ -75,3 +75,7 @@
 - 버그나 제안할 사항은 인벤 '미암대군' 쪽지 또는 miamdaegun@gmail.com 으로 반드시 알려주세요.
 - 프롬프트 변경 후 혹시 더 잘된다/ 더 빠르다 싶은 것도 저한테 알려주시면 감사하겠습니다.
 - 본인 귀책으로 인한 api 정지 등에 대해 책임을 지지 않습니다.
+
+## 여담
+예전에 만든 환산 유령광고 납치 방지 프로그램도 만들었었는데 많관부
+https://github.com/miamdaegun/maple_scouter_debug/tree/main
