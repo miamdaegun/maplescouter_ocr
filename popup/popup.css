@@ -13,10 +13,10 @@
   --accent: #f5a623;
   --accent2: #e06c1b;
   --gold: #ffd166;
-  --legendary: #ff6b35;
-  --unique: #cc88ff;
-  --epic: #6699ff;
-  --rare: #66ff99;
+  --legendary: #66ff99;
+  --unique: #ffd166;
+  --epic: #cc88ff;
+  --rare: #6699ff;
   --text: #e8eaf2;
   --text-muted: #7a80a0;
   --success: #4ecdc4;
@@ -441,6 +441,85 @@ input::placeholder { color: var(--text-muted); opacity: 0.6; }
   color: #000;
   background: #fff;
 }
+
+/* Custom Grade Dropdown */
+.grade-select {
+  position: relative;
+  flex: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.grade-select-trigger {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font);
+  padding-right: 18px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.grade-select-trigger::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%237a80a0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  transition: transform 0.15s ease;
+}
+
+.grade-select.open .grade-select-trigger::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.grade-trigger-레전드리 { color: var(--legendary); font-weight: 700; }
+.grade-trigger-유니크   { color: var(--unique);    font-weight: 700; }
+.grade-trigger-에픽     { color: var(--epic);      font-weight: 700; }
+.grade-trigger-레어     { color: var(--rare);      font-weight: 700; }
+
+.grade-select-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  min-width: 140px;
+  z-index: 999;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.grade-select.open .grade-select-menu { display: block; }
+
+.grade-select-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.grade-select-item:hover                    { background: rgba(255, 255, 255, 0.05); }
+.grade-select-item.selected                 { font-weight: 700; }
+
+.grade-item-레전드리         { color: var(--legendary); }
+.grade-item-유니크           { color: var(--unique); }
+.grade-item-에픽             { color: var(--epic); }
+.grade-item-레어             { color: var(--rare); }
+
+.grade-item-레전드리.selected { background: rgba(102, 255, 153, 0.1); }
+.grade-item-유니크.selected   { background: rgba(255, 209, 102, 0.1); }
+.grade-item-에픽.selected     { background: rgba(204, 136, 255, 0.1); }
+.grade-item-레어.selected     { background: rgba(102, 153, 255, 0.1); }
 .ocr-section-head {
   font-size: 10px; font-weight: 700; color: var(--accent);
   padding: 6px 0 2px 0; border-bottom: 1px solid var(--border); margin-top: 2px;
@@ -510,10 +589,10 @@ input::placeholder { color: var(--text-muted); opacity: 0.6; }
   flex-shrink: 0;
 }
 
-.grade-레전드리 { background: rgba(255, 107, 53, 0.2); color: var(--legendary); border: 1px solid var(--legendary); }
-.grade-유니크 { background: rgba(204, 136, 255, 0.2); color: var(--unique); border: 1px solid var(--unique); }
-.grade-에픽 { background: rgba(102, 153, 255, 0.2); color: var(--epic); border: 1px solid var(--epic); }
-.grade-레어 { background: rgba(102, 255, 153, 0.2); color: var(--rare); border: 1px solid var(--rare); }
+.grade-레전드리 { background: rgba(102, 255, 153, 0.2); color: var(--legendary); border: 1px solid var(--legendary); }
+.grade-유니크   { background: rgba(255, 209, 102, 0.2); color: var(--unique);    border: 1px solid var(--unique); }
+.grade-에픽     { background: rgba(204, 136, 255, 0.2); color: var(--epic);      border: 1px solid var(--epic); }
+.grade-레어     { background: rgba(102, 153, 255, 0.2); color: var(--rare);      border: 1px solid var(--rare); }
 
 .empty-state {
   text-align: center;

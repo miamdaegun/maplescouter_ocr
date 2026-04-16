@@ -302,7 +302,7 @@ function saveCurrentOcrState() {
   if (document.getElementById('ocrResult').style.display === 'none') return;
   const grid = document.getElementById('ocrParsedGrid');
   const data = {};
-  grid.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = el.value.trim(); });
+  grid.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = (el.value ?? el.dataset.value ?? '').trim(); });
   
   const state = {
     image: currentImageBase64,
@@ -352,6 +352,41 @@ if (chkAutoViewer) {
   });
 }
 document.getElementById('ocrParsedGrid')?.addEventListener('input', saveCurrentOcrState);
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.grade-select.open').forEach(el => el.classList.remove('open'));
+});
+
+document.getElementById('ocrParsedGrid')?.addEventListener('click', (e) => {
+  const trigger = e.target.closest('.grade-select-trigger');
+  const item = e.target.closest('.grade-select-item');
+
+  if (trigger) {
+    e.stopPropagation();
+    const select = trigger.closest('.grade-select');
+    const wasOpen = select.classList.contains('open');
+    document.querySelectorAll('.grade-select.open').forEach(el => el.classList.remove('open'));
+    if (!wasOpen) select.classList.add('open');
+    return;
+  }
+
+  if (item) {
+    e.stopPropagation();
+    const select = item.closest('.grade-select');
+    const value = item.dataset.value;
+    select.dataset.value = value;
+
+    const triggerEl = select.querySelector('.grade-select-trigger');
+    triggerEl.textContent = value || '없음';
+    triggerEl.className = 'grade-select-trigger' + (value ? ` grade-trigger-${value}` : '');
+
+    select.querySelectorAll('.grade-select-item').forEach(i =>
+      i.classList.toggle('selected', i.dataset.value === value)
+    );
+    select.classList.remove('open');
+    saveCurrentOcrState();
+  }
+});
 
 function setImage(file) {
   currentImageMediaType = file.type || 'image/png';
@@ -525,8 +560,11 @@ function renderOcrResult(parsed) {
   const sectionHead = (title) => `<div class="ocr-section-head">${title}</div>`;
   const GRADE_OPTIONS = ['', '레어', '에픽', '유니크', '레전드리'];
   const gradeSelect = (label, value, key) => {
-    const opts = GRADE_OPTIONS.map(g => `<option value="${g}"${g === (value || '') ? ' selected' : ''}>${g || '없음'}</option>`).join('');
-    return `<div class="ocr-field"><span class="ocr-field-label">${label}</span><select class="ocr-field-value ocr-field-select" data-key="${key}">${opts}</select></div>`;
+    const items = GRADE_OPTIONS.map(g =>
+      `<div class="grade-select-item${g === value ? ' selected' : ''}${g ? ` grade-item-${g}` : ''}" data-value="${g}">${g || '없음'}</div>`
+    ).join('');
+    const triggerClass = value ? ` grade-trigger-${value}` : '';
+    return `<div class="ocr-field"><span class="ocr-field-label">${label}</span><div class="grade-select" data-key="${key}" data-value="${value || ''}"><div class="grade-select-trigger${triggerClass}">${value || '없음'}</div><div class="grade-select-menu">${items}</div></div></div>`;
   };
   const t = parsed.totalOption || {};
   const statField = (label, statKey) => field(label, t[statKey] ?? '0', `total_${statKey}`);
@@ -550,7 +588,7 @@ function renderOcrResult(parsed) {
 
 function buildItemFromOcrResult() {
   const grid = document.getElementById('ocrParsedGrid');
-  const data = {}; grid.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = el.value.trim(); });
+  const data = {}; grid.querySelectorAll('[data-key]').forEach(el => { data[el.dataset.key] = (el.value ?? el.dataset.value ?? '').trim(); });
   const getN = (k) => String(parseInt(data[k]) || 0);
 
   const baseEqLevel = parseInt(data['base_equipment_level']) || 0;
