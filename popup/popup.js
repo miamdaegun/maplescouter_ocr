@@ -277,6 +277,7 @@ function loadSavedOcrState() {
         statusEl.className = 'ocr-status ok';
         statusEl.textContent = `✓ 저장된 작업 내역을 불러왔습니다.`;
         statusEl.style.display = 'block';
+        document.getElementById('btnRunOcr').textContent = '🔄 다시 분석하기';
       }
     } catch (e) {
       console.error("Saved state parsing error:", e);
@@ -289,7 +290,9 @@ function clearOcrState() {
   currentImageBase64 = null;
   document.getElementById('ocrPreviewWrap').style.display = 'none';
   document.getElementById('dropZone').style.display = 'block';
-  document.getElementById('btnRunOcr').disabled = true;
+  const btnOcr = document.getElementById('btnRunOcr');
+  btnOcr.disabled = true;
+  btnOcr.textContent = '🔍 AI로 아이템 옵션 읽기';
   document.getElementById('ocrResult').style.display = 'none';
   document.getElementById('ocrStatus').style.display = 'none';
   document.getElementById('fileInput').value = '';
@@ -359,7 +362,9 @@ function setImage(file) {
     document.getElementById('ocrPreview').src = dataUrl;
     document.getElementById('ocrPreviewWrap').style.display = 'block';
     document.getElementById('dropZone').style.display = 'none';
-    document.getElementById('btnRunOcr').disabled = false;
+    const btnOcr = document.getElementById('btnRunOcr');
+    btnOcr.disabled = false;
+    btnOcr.textContent = '🔍 AI로 아이템 옵션 읽기';
     document.getElementById('ocrResult').style.display = 'none';
     document.getElementById('ocrStatus').style.display = 'none';
   };
@@ -587,6 +592,7 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
     renderOcrResult(parsed);
     saveCurrentOcrState();
     trackApiCall();
+    btn.textContent = '🔄 다시 분석하기';
 
     chrome.storage.session.set({ ocr_preview_image: `data:${currentImageMediaType};base64,${currentImageBase64}` });
     if (localStorage.getItem('maple_auto_viewer') === 'true') openViewerWindow();
