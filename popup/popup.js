@@ -34,6 +34,7 @@ document.querySelectorAll('.tab').forEach((tab) => {
 
     if (tab.dataset.tab === 'list') loadBookmarkList();
     if (tab.dataset.tab === 'ocr') loadSettings();
+    if (tab.dataset.tab === 'advanced') loadPromptEditor();
   });
 });
 
@@ -478,7 +479,7 @@ async function runGeminiVision(base64Image, mediaType, apiKey) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{
-        parts: [{ text: GEMINI_PROMPT }, { inline_data: { mime_type: mediaType, data: base64Image } }]
+        parts: [{ text: localStorage.getItem('maple_custom_prompt') || GEMINI_PROMPT }, { inline_data: { mime_type: mediaType, data: base64Image } }]
       }],
       generationConfig: { response_mime_type: "application/json" }
     })
@@ -614,6 +615,43 @@ document.getElementById('btnOcrSubmit')?.addEventListener('click', async () => {
   }
 });
 
+// ─── 고급: 프롬프트 편집기 ────────────────────────────────
+function loadPromptEditor() {
+  const editor = document.getElementById('promptEditor');
+  const status = document.getElementById('promptStatus');
+  if (!editor) return;
+
+  const saved = localStorage.getItem('maple_custom_prompt');
+  editor.value = saved || GEMINI_PROMPT;
+
+  if (saved) {
+    status.textContent = '⚠ 현재 수정된 프롬프트를 사용 중입니다.';
+    status.className = 'prompt-status warn';
+  } else {
+    status.textContent = '기본 프롬프트를 사용 중입니다.';
+    status.className = 'prompt-status';
+  }
+}
+
+document.getElementById('btnSavePrompt')?.addEventListener('click', () => {
+  const val = document.getElementById('promptEditor').value.trim();
+  if (!val) return;
+  localStorage.setItem('maple_custom_prompt', val);
+  const status = document.getElementById('promptStatus');
+  status.textContent = '⚠ 현재 수정된 프롬프트를 사용 중입니다.';
+  status.className = 'prompt-status warn';
+  showToast('프롬프트가 저장되었습니다.', 'success');
+});
+
+document.getElementById('btnResetPrompt')?.addEventListener('click', () => {
+  localStorage.removeItem('maple_custom_prompt');
+  document.getElementById('promptEditor').value = GEMINI_PROMPT;
+  const status = document.getElementById('promptStatus');
+  status.textContent = '기본 프롬프트를 사용 중입니다.';
+  status.className = 'prompt-status';
+  showToast('기본 프롬프트로 초기화되었습니다.', 'success');
+});
+
 // ─── 업데이트 확인 ────────────────────────────────────────
 const GITHUB_MANIFEST_URL = 'https://raw.githubusercontent.com/miamdaegun/maplescouter_ocr/main/manifest.json';
 
@@ -650,6 +688,7 @@ const BACKUP_DEFAULTS = {
   'maple_selected_model': 'gemini-2.5-flash',
   'maple_auto_viewer': 'false',
   'maple_auto_update': 'false',
+  'maple_custom_prompt': '',
 };
 
 document.getElementById('btnExportSettings')?.addEventListener('click', () => {
