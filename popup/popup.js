@@ -644,6 +644,55 @@ document.getElementById('btnDismissUpdate')?.addEventListener('click', () => {
   document.getElementById('updateBanner').style.display = 'none';
 });
 
+// ─── 설정 백업 / 복원 ─────────────────────────────────────
+const BACKUP_DEFAULTS = {
+  'maple_gemini_api_key': '',
+  'maple_selected_model': 'gemini-2.5-flash',
+  'maple_auto_viewer': 'false',
+  'maple_auto_update': 'false',
+};
+
+document.getElementById('btnExportSettings')?.addEventListener('click', () => {
+  const settings = {};
+  Object.entries(BACKUP_DEFAULTS).forEach(([k, defaultVal]) => {
+    settings[k] = localStorage.getItem(k) ?? defaultVal;
+  });
+
+  const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'maplescouter_settings.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('설정이 백업되었습니다.', 'success');
+});
+
+document.getElementById('btnImportSettings')?.addEventListener('click', () => {
+  document.getElementById('importFileInput').click();
+});
+
+document.getElementById('importFileInput')?.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const settings = JSON.parse(ev.target.result);
+      Object.keys(BACKUP_DEFAULTS).forEach(k => {
+        if (settings[k] !== undefined) localStorage.setItem(k, settings[k]);
+      });
+      loadSettings();
+      showToast('설정이 복원되었습니다.', 'success');
+    } catch (_) {
+      showToast('올바른 백업 파일이 아닙니다.', 'error');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
 // ─── 초기 구동 ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   checkPageStatus();

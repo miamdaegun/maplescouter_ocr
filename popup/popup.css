@@ -302,6 +302,9 @@ input::placeholder { color: var(--text-muted); opacity: 0.6; }
 /* OCR & API Config */
 .api-key-row { display: flex; gap: 6px; }
 .api-key-row input { flex: 1; }
+
+.backup-row { display: flex; gap: 6px; margin-top: 6px; }
+.btn-backup { flex: 1; text-align: center; }
 .api-key-status { font-size: 10px; margin-top: 3px; display: block; }
 .api-key-status.ok  { color: var(--success); }
 .api-key-status.err { color: var(--error); }
