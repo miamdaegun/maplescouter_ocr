@@ -23,6 +23,12 @@
       </a>
     </header>
 
+    <div class="update-banner" id="updateBanner" style="display:none">
+      <span id="updateBannerText"></span>
+      <a href="https://github.com/miamdaegun/maplescouter_ocr" target="_blank" class="update-link">GitHub 바로가기</a>
+      <button class="update-dismiss" id="btnDismissUpdate">✕</button>
+    </div>
+
     <div class="status-bar" id="statusBar">
       <span id="statusText">maplescouter.com에 접속해주세요</span>
     </div>
@@ -42,6 +48,10 @@
           <button class="btn-small" id="btnSaveKey">저장</button>
         </div>
         <span class="api-key-status" id="apiKeyStatus"></span>
+        <label class="auto-viewer-toggle" style="margin-top:6px">
+          <input type="checkbox" id="chkAutoUpdate" />
+          <span>실행 시 자동 업데이트 확인</span>
+        </label>
       </div>
 
       <div class="section-title" style="margin-top:12px">사용 모델 선택</div>

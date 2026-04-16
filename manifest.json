@@ -8,7 +8,8 @@
     "https://maplescouter.com/*",
     "http://maplescouter.com/*",
     "https://generativelanguage.googleapis.com/*",
-    "https://firestore.googleapis.com/*"
+    "https://firestore.googleapis.com/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

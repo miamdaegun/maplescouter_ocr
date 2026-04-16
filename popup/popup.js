@@ -614,9 +614,40 @@ document.getElementById('btnOcrSubmit')?.addEventListener('click', async () => {
   }
 });
 
+// ─── 업데이트 확인 ────────────────────────────────────────
+const GITHUB_MANIFEST_URL = 'https://raw.githubusercontent.com/miamdaegun/maplescouter_ocr/main/manifest.json';
+
+async function checkForUpdates() {
+  if (localStorage.getItem('maple_auto_update') !== 'true') return;
+  try {
+    const res = await fetch(GITHUB_MANIFEST_URL + '?t=' + Date.now());
+    const remote = await res.json();
+    const local = chrome.runtime.getManifest().version;
+    if (remote.version !== local) {
+      const banner = document.getElementById('updateBanner');
+      document.getElementById('updateBannerText').textContent =
+        `새 버전이 있습니다! (현재 ${local} → 최신 ${remote.version})`;
+      banner.style.display = 'flex';
+    }
+  } catch (_) {}
+}
+
+const chkAutoUpdate = document.getElementById('chkAutoUpdate');
+if (chkAutoUpdate) {
+  chkAutoUpdate.checked = localStorage.getItem('maple_auto_update') === 'true';
+  chkAutoUpdate.addEventListener('change', () => {
+    localStorage.setItem('maple_auto_update', chkAutoUpdate.checked);
+  });
+}
+
+document.getElementById('btnDismissUpdate')?.addEventListener('click', () => {
+  document.getElementById('updateBanner').style.display = 'none';
+});
+
 // ─── 초기 구동 ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   checkPageStatus();
   loadSettings();
   loadSavedOcrState();
+  checkForUpdates();
 });
