@@ -312,7 +312,7 @@ function saveCurrentOcrState() {
       totalOption: { str: data['total_str'], dex: data['total_dex'], int: data['total_int'], luk: data['total_luk'], max_hp: data['total_max_hp'], attack_power: data['total_attack_power'], magic_power: data['total_magic_power'], all_stat: data['total_all_stat'], boss_damage: data['total_boss_damage'], damage: data['total_damage'], ignore_monster_armor: data['total_ignore_monster_armor'], armor: data['total_armor'], max_hp_rate: data['total_max_hp_rate'] },
       potential_grade: data['potential_grade'], potential_option_1: [data['pot1'], data['pot2'], data['pot3']],
       additional_potential_grade: data['additional_potential_grade'], additional_potential_option_1: [data['add1'], data['add2'], data['add3']],
-      exceptionalOption: { str: data['ex_str'], dex: data['ex_dex'], int: data['ex_int'], luk: data['ex_luk'], max_hp: data['ex_max_hp'], max_mp: data['ex_max_mp'], attack_power: data['ex_attack_power'], magic_power: data['ex_magic_power'], exceptional_upgrade: data['ex_upgrade'] }
+      exceptionalOption: { str: data['ex_all_stat'], dex: data['ex_all_stat'], int: data['ex_all_stat'], luk: data['ex_all_stat'], max_hp: data['ex_hpmp'], max_mp: data['ex_hpmp'], attack_power: data['ex_atkmag'], magic_power: data['ex_atkmag'], exceptional_upgrade: data['ex_upgrade'] }
     }
   };
   localStorage.setItem('maple_ocr_state', JSON.stringify(state));
@@ -568,6 +568,7 @@ function renderOcrResult(parsed) {
   };
   const t = parsed.totalOption || {};
   const statField = (label, statKey) => field(label, t[statKey] ?? '0', `total_${statKey}`);
+  const statFieldPct = (label, statKey) => field(label, (parseInt(t[statKey]) || 0) + '%', `total_${statKey}`);
 
   const hasPotential = !!parsed.potential_grade;
   const hasAdditional = !!parsed.additional_potential_grade;
@@ -579,7 +580,7 @@ function renderOcrResult(parsed) {
 
   const sections = [
     sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), ...(isWeaponOrSub ? [field('세부 명칭', parsed.part ?? '', 'part')] : []), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), ...(isWeapon ? [field('소울 등급', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option')] : []),
-    sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statField('올스탯', 'all_stat'), statField('최대HP', 'max_hp'), statField('최대HP%', 'max_hp_rate'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statField('데미지%', 'damage'), statField('보공%', 'boss_damage'), statField('방무%', 'ignore_monster_armor'),
+    sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statFieldPct('올스탯', 'all_stat'), statField('최대HP', 'max_hp'), statFieldPct('최대HP%', 'max_hp_rate'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statFieldPct('데미지%', 'damage'), statFieldPct('보공%', 'boss_damage'), statFieldPct('방무%', 'ignore_monster_armor'),
     ...(hasPotential ? [sectionHead('잠재능력'), gradeSelect('잠재 등급', parsed.potential_grade, 'potential_grade'), field('잠재 1', parsed.potential_option_1?.[0], 'pot1'), field('잠재 2', parsed.potential_option_1?.[1], 'pot2'), field('잠재 3', parsed.potential_option_1?.[2], 'pot3')] : []),
     ...(hasAdditional ? [sectionHead('에디셔널 잠재능력'), gradeSelect('에디 등급', parsed.additional_potential_grade, 'additional_potential_grade'), field('에디 1', parsed.additional_potential_option_1?.[0], 'add1'), field('에디 2', parsed.additional_potential_option_1?.[1], 'add2'), field('에디 3', parsed.additional_potential_option_1?.[2], 'add3')] : []),
     ...(hasExceptional ? [sectionHead('익셉셔널 옵션'), field('올스탯', ex.str ?? '0', 'ex_all_stat'), field('최대HP/MP', ex.max_hp ?? '0', 'ex_hpmp'), field('공격력/마력', ex.attack_power ?? '0', 'ex_atkmag'), field('강화횟수', ex.exceptional_upgrade ?? 0, 'ex_upgrade')] : []),
@@ -651,6 +652,9 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
     trackApiCall();
     btn.textContent = '🔄 다시 분석하기';
 
+    const submitBtn = document.getElementById('btnOcrSubmit');
+    if (submitBtn) { submitBtn.disabled = true; setTimeout(() => { submitBtn.disabled = false; }, 1000); }
+
     chrome.storage.session.set({ ocr_preview_image: `data:${currentImageMediaType};base64,${currentImageBase64}` });
     if (localStorage.getItem('maple_auto_viewer') === 'true') openViewerWindow();
 
@@ -673,7 +677,6 @@ document.getElementById('btnOcrSubmit')?.addEventListener('click', async () => {
     const item = buildItemFromOcrResult();
     if (!item.name) throw new Error('아이템 이름이 없습니다.');
     if (!item.slot) throw new Error('부위가 없습니다.');
-    await new Promise(resolve => setTimeout(resolve, 1000));
     const res = await addBookmarkToPage(item);
     
     if (res.success) { showToast(res.message, 'success'); closeViewerWindow(); } 
@@ -740,7 +743,7 @@ async function checkForUpdates() {
 
 const chkAutoUpdate = document.getElementById('chkAutoUpdate');
 if (chkAutoUpdate) {
-  chkAutoUpdate.checked = localStorage.getItem('maple_auto_update') === 'true';
+  chkAutoUpdate.checked = (localStorage.getItem('maple_auto_update') ?? 'true') !== 'false';
   chkAutoUpdate.addEventListener('change', () => {
     localStorage.setItem('maple_auto_update', chkAutoUpdate.checked);
   });
@@ -755,7 +758,7 @@ const BACKUP_DEFAULTS = {
   'maple_gemini_api_key': '',
   'maple_selected_model': 'gemini-2.5-flash',
   'maple_auto_viewer': 'true',
-  'maple_auto_update': 'false',
+  'maple_auto_update': 'true',
   'maple_custom_prompt': '',
 };
 
