@@ -81,7 +81,7 @@ async function addBookmarkToPage(item) {
 
       current.state.bookmarkList.push(newItem);
       localStorage.setItem('equipBookmarkList', JSON.stringify(current));
-      return { success: true, message: `"${newItem.name}" 추가 완료! 현재 북마크: ${current.state.bookmarkList.length}개` };
+      return { success: true, message: `"${newItem.name}" 추가 완료! 현재 북마크: ${current.state.bookmarkList.length}개\n아이템 메이커 창을 (F5)새로고침해주세요.` };
     } catch (e) {
       return { success: false, message: '오류: ' + e.message };
     }
@@ -143,7 +143,7 @@ document.getElementById('btnRefresh')?.addEventListener('click', loadBookmarkLis
 let toastTimer;
 function showToast(message, type = 'default') {
   const toast = document.getElementById('toast');
-  toast.textContent = message;
+  toast.innerText = message;
   toast.className = `toast show ${type}`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3000);
@@ -346,7 +346,7 @@ document.getElementById('btnOpenViewer')?.addEventListener('click', openViewerWi
 
 const chkAutoViewer = document.getElementById('chkAutoViewer');
 if (chkAutoViewer) {
-  chkAutoViewer.checked = localStorage.getItem('maple_auto_viewer') === 'true';
+  chkAutoViewer.checked = (localStorage.getItem('maple_auto_viewer') ?? 'true') !== 'false';
   chkAutoViewer.addEventListener('change', () => {
     localStorage.setItem('maple_auto_viewer', chkAutoViewer.checked);
   });
@@ -459,7 +459,7 @@ const GEMINI_PROMPT = `
 - "올스탯 +N": str, dex, int, luk 키에 각각 동일하게 "N"을 입력하세요. (예: 올스탯 +15 -> str: "15", dex: "15", int: "15", luk: "15")
 - "최대 HP / 최대 MP +N": max_hp에 "N", max_mp에 "N"을 입력하세요.
 - "공격력 / 마력 +N": attack_power에 "N", magic_power에 "N"을 입력하세요.
-- "익셉셔널 : N회": exceptional_upgrade 키에 숫자 N을 입력하세요. (예: "익셉셔널 : 1회" -> exceptional_upgrade: 1)
+- 강화 횟수 추출: "익셉셔널 : N회", 어떤 형식이든 현재까지 강화된 횟수 N을 exceptional_upgrade 키에 정수로 입력하세요. (예: "익셉셔널 : 1회" -> exceptional_upgrade: 1)
 
 [★ 스탯-JSON 키 매핑 규칙 (매우 중요)]
 - STR -> str
@@ -572,14 +572,17 @@ function renderOcrResult(parsed) {
   const hasPotential = !!parsed.potential_grade;
   const hasAdditional = !!parsed.additional_potential_grade;
   const ex = parsed.exceptionalOption || {};
-  const hasExceptional = ['str','dex','int','luk','max_hp','max_mp','attack_power','magic_power'].some(k => parseInt(ex[k]) > 0);
+  const hasExceptional = parseInt(ex.exceptional_upgrade) > 0 || ['str','dex','int','luk','max_hp','max_mp','attack_power','magic_power'].some(k => parseInt(ex[k]) > 0);
+
+  const isWeapon = parsed.slot === '무기';
+  const isWeaponOrSub = isWeapon || parsed.slot === '보조무기';
 
   const sections = [
-    sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), field('세부 명칭', parsed.part ?? '', 'part'), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), field('소울 등급', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option'),
-    sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statField('최대HP', 'max_hp'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statField('올스탯', 'all_stat'), statField('보공%', 'boss_damage'), statField('데미지%', 'damage'), statField('방무%', 'ignore_monster_armor'), statField('방어력', 'armor'), statField('HP%', 'max_hp_rate'),
+    sectionHead('기본 정보'), field('아이템명', parsed.name, 'name'), field('부위', parsed.slot, 'slot'), ...(isWeaponOrSub ? [field('세부 명칭', parsed.part ?? '', 'part')] : []), field('요구 레벨', parsed.base_equipment_level ?? '0', 'base_equipment_level'), field('주문서', parsed.scroll_upgrade ?? '0', 'scroll_upgrade'), ...(isWeapon ? [field('소울 등급', parsed.soul_name ?? '', 'soul_name'), field('소울 옵션', parsed.soul_option ?? '', 'soul_option')] : []),
+    sectionHead('총합 스탯 (확인 후 수정 가능)'), statField('STR', 'str'), statField('DEX', 'dex'), statField('INT', 'int'), statField('LUK', 'luk'), statField('올스탯', 'all_stat'), statField('최대HP', 'max_hp'), statField('최대HP%', 'max_hp_rate'), statField('공격력', 'attack_power'), statField('마력', 'magic_power'), statField('데미지%', 'damage'), statField('보공%', 'boss_damage'), statField('방무%', 'ignore_monster_armor'),
     ...(hasPotential ? [sectionHead('잠재능력'), gradeSelect('잠재 등급', parsed.potential_grade, 'potential_grade'), field('잠재 1', parsed.potential_option_1?.[0], 'pot1'), field('잠재 2', parsed.potential_option_1?.[1], 'pot2'), field('잠재 3', parsed.potential_option_1?.[2], 'pot3')] : []),
     ...(hasAdditional ? [sectionHead('에디셔널 잠재능력'), gradeSelect('에디 등급', parsed.additional_potential_grade, 'additional_potential_grade'), field('에디 1', parsed.additional_potential_option_1?.[0], 'add1'), field('에디 2', parsed.additional_potential_option_1?.[1], 'add2'), field('에디 3', parsed.additional_potential_option_1?.[2], 'add3')] : []),
-    ...(hasExceptional ? [sectionHead('익셉셔널 옵션'), field('STR', ex.str ?? '0', 'ex_str'), field('DEX', ex.dex ?? '0', 'ex_dex'), field('INT', ex.int ?? '0', 'ex_int'), field('LUK', ex.luk ?? '0', 'ex_luk'), field('최대HP', ex.max_hp ?? '0', 'ex_max_hp'), field('최대MP', ex.max_mp ?? '0', 'ex_max_mp'), field('공격력', ex.attack_power ?? '0', 'ex_attack_power'), field('마력', ex.magic_power ?? '0', 'ex_magic_power'), field('강화횟수', ex.exceptional_upgrade ?? 0, 'ex_upgrade')] : []),
+    ...(hasExceptional ? [sectionHead('익셉셔널 옵션'), field('올스탯', ex.str ?? '0', 'ex_all_stat'), field('최대HP/MP', ex.max_hp ?? '0', 'ex_hpmp'), field('공격력/마력', ex.attack_power ?? '0', 'ex_atkmag'), field('강화횟수', ex.exceptional_upgrade ?? 0, 'ex_upgrade')] : []),
   ];
 
   grid.innerHTML = sections.join('');
@@ -602,8 +605,8 @@ function buildItemFromOcrResult() {
   return {
     slot, part, name: data['name'] || '', iconUrl: '', starforce: '0', starforce_scroll_flag: '미사용', scroll_upgrade: data['scroll_upgrade'] || '0', totalOption, baseOption: { ...zeroStats(), base_equipment_level: baseEqLevel }, addOption: zeroStats(), etcOption: zeroStats(), starforceOption: zeroStats(),
     potential_grade: data['potential_grade'] || '', potential_option_1: [data['pot1']||'', data['pot2']||'', data['pot3']||''], additional_potential_grade: data['additional_potential_grade'] || '', additional_potential_option_1: [data['add1']||'', data['add2']||'', data['add3']||''],
-    exceptionalOption: { str: getN('ex_str'), dex: getN('ex_dex'), int: getN('ex_int'), luk: getN('ex_luk'), max_hp: getN('ex_max_hp'), max_mp: getN('ex_max_mp'), attack_power: getN('ex_attack_power'), magic_power: getN('ex_magic_power'), exceptional_upgrade: parseInt(data['ex_upgrade'] || '0') || 0 },
-    hasExceptional: (parseInt(data['ex_str']) > 0 || parseInt(data['ex_dex']) > 0 || parseInt(data['ex_int']) > 0 || parseInt(data['ex_luk']) > 0 || parseInt(data['ex_max_hp']) > 0 || parseInt(data['ex_attack_power']) > 0 || parseInt(data['ex_magic_power']) > 0),
+    exceptionalOption: { str: getN('ex_all_stat'), dex: getN('ex_all_stat'), int: getN('ex_all_stat'), luk: getN('ex_all_stat'), max_hp: getN('ex_hpmp'), max_mp: getN('ex_hpmp'), attack_power: getN('ex_atkmag'), magic_power: getN('ex_atkmag'), exceptional_upgrade: parseInt(data['ex_upgrade'] || '0') || 0 },
+    hasExceptional: (parseInt(data['ex_all_stat']) > 0 || parseInt(data['ex_hpmp']) > 0 || parseInt(data['ex_atkmag']) > 0),
     soul_name: data['soul_name'] || null, soul_option: soulOption, ring_level: 0, itemScore: '0', character_name: 'ocr' + new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/\D/g, ''), class_group: '전사', cuttable_count: '255', title: '', bookMark: true, base_equipment_level: baseEqLevel,
   };
 }
@@ -618,15 +621,31 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
   const btn = document.getElementById('btnRunOcr');
   statusEl.style.display = 'block';
   statusEl.className = 'ocr-status loading';
-  statusEl.textContent = '🤖 AI 분석 중...';
+  let dotCount = 1;
+  statusEl.textContent = '🤖 AI 분석 중, 조금만 기다려 주세요.';
+  const dotTimer = setInterval(() => {
+    dotCount = (dotCount % 4) + 1;
+    statusEl.textContent = '🤖 AI 분석 중, 조금만 기다려 주세요' + '.'.repeat(dotCount);
+  }, 500);
   btn.disabled = true;
   document.getElementById('ocrResult').style.display = 'none';
+
+  const blockPaste = (e) => { e.preventDefault(); e.stopPropagation(); };
+  document.addEventListener('paste', blockPaste, true);
+  document.getElementById('btnClearImage')?.setAttribute('disabled', '');
+  document.getElementById('btnResetState')?.setAttribute('disabled', '');
 
   try {
     const parsed = await runGeminiVision(currentImageBase64, currentImageMediaType, apiKey);
     statusEl.className = 'ocr-status ok';
+
+    if (parsed.name) {
+      if (parsed.name.includes('라피스')) { parsed.part = '대검'; parsed.slot = '무기'; }
+      else if (parsed.name.includes('라즐리')) { parsed.part = '태도'; parsed.slot = '보조무기'; }
+    }
+
     statusEl.textContent = `✓ 분석 완료! "${parsed.name || '이름 미인식'}" — 수치를 확인 후 추가하세요.`;
-    
+
     renderOcrResult(parsed);
     saveCurrentOcrState();
     trackApiCall();
@@ -640,7 +659,11 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
     statusEl.textContent = '✗ 오류: ' + e.message;
     console.error('[Gemini OCR]', e);
   } finally {
+    clearInterval(dotTimer);
     btn.disabled = false;
+    document.removeEventListener('paste', blockPaste, true);
+    document.getElementById('btnClearImage')?.removeAttribute('disabled');
+    document.getElementById('btnResetState')?.removeAttribute('disabled');
   }
 });
 
@@ -650,6 +673,7 @@ document.getElementById('btnOcrSubmit')?.addEventListener('click', async () => {
     const item = buildItemFromOcrResult();
     if (!item.name) throw new Error('아이템 이름이 없습니다.');
     if (!item.slot) throw new Error('부위가 없습니다.');
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const res = await addBookmarkToPage(item);
     
     if (res.success) { showToast(res.message, 'success'); closeViewerWindow(); } 
@@ -730,7 +754,7 @@ document.getElementById('btnDismissUpdate')?.addEventListener('click', () => {
 const BACKUP_DEFAULTS = {
   'maple_gemini_api_key': '',
   'maple_selected_model': 'gemini-2.5-flash',
-  'maple_auto_viewer': 'false',
+  'maple_auto_viewer': 'true',
   'maple_auto_update': 'false',
   'maple_custom_prompt': '',
 };
