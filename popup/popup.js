@@ -671,15 +671,20 @@ document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
   }
 });
 
-document.getElementById('btnOcrSubmit')?.addEventListener('click', async () => {
+document.getElementById('btnOcrSubmit')?.addEventListener('click', async (e) => {
+  const submitBtn = e.currentTarget;
+  if (submitBtn.disabled) return;
+  submitBtn.disabled = true;
+  setTimeout(() => { submitBtn.disabled = false; }, 1000);
+
   if (!(await checkPageStatus())) return;
   try {
     const item = buildItemFromOcrResult();
     if (!item.name) throw new Error('아이템 이름이 없습니다.');
     if (!item.slot) throw new Error('부위가 없습니다.');
     const res = await addBookmarkToPage(item);
-    
-    if (res.success) { showToast(res.message, 'success'); closeViewerWindow(); } 
+
+    if (res.success) { showToast(res.message, 'success'); closeViewerWindow(); }
     else { showToast(res.message, 'error'); }
   } catch (e) {
     showToast(e.message, 'error');
