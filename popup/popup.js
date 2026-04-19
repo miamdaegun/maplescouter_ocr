@@ -1,3 +1,180 @@
+// ─── 아이콘 URL 맵 ────────────────────────────────────────
+const BASE = 'https://open.api.nexon.com/static/maplestory/item/icon/';
+const BASESEA = 'https://open.api.nexon.com/static/maplestorysea/item/icon/';
+const ICON_MAP = {
+  // 모자
+  '하이네스 워리어헬름': BASE+'KEPCIAHG', '카오스 벨룸의 헬름': BASE+'KEPCIAMD', '도전자의 모자': BASE+'KEPCNCNF',
+  '앱솔랩스 나이트헬름': BASE+'KEPCPDMD', '아케인셰이드 나이트햇': BASE+'KEPCPPOJ', '에테르넬 나이트헬름': BASE+'KEPCOOGB',
+  '하이네스 레인져베레': BASE+'KEPCIAHI', '앱솔랩스 아처후드': BASE+'KEPCPDMF', '아케인셰이드 아처햇': BASE+'KEPCPPPB', '에테르넬 아처햇': BASE+'KEPCOOGD',
+  '하이네스 어새신보닛': BASE+'KEPCIPOB', '앱솔랩스 시프캡': BASE+'KEPCPDME', '아케인셰이드 시프햇': BASE+'KEPCPPPA', '에테르넬 시프반다나': BASE+'KEPCOOGC',
+  '하이네스 던위치햇': BASE+'KEPCIAHJ', '앱솔랩스 메이지크라운': BASE+'KEPCPDMC', '아케인셰이드 메이지햇': BASE+'KEPCPPOI', '에테르넬 메이지햇': BASE+'KEPCOOGA',
+  '하이네스 원더러햇': BASE+'KEPCIPOA', '앱솔랩스 파이렛페도라': BASE+'KEPCPDMH', '아케인셰이드 파이렛햇': BASE+'KEPCPPPD', '에테르넬 파이렛햇': BASE+'KEPCOOGF',
+  // 상의
+  '이글아이 워리어아머': BASE+'KEPGJFLF', '도전자의 상의': BASE+'KEPGJDIH',
+  '에테르넬 나이트아머': BASE+'KEPGJDNC', '이글아이 레인져후드': BASE+'KEPGJFLH', '에테르넬 아처후드': BASE+'KEPGJDNE',
+  '이글아이 어새신셔츠': BASE+'KEPGJFLG', '에테르넬 시프셔츠': BASE+'KEPGJDNH',
+  '이글아이 던위치로브': BASE+'KEPGJFLE', '에테르넬 메이지로브': BASE+'KEPGJDNF',
+  '이글아이 원더러코트': BASE+'KEPGJFLJ', '에테르넬 파이렛코트': BASE+'KEPGJDNG',
+  // 하의
+  '트릭스터 워리어팬츠': BASE+'KEPEJGIE', '도전자의 하의': BASE+'KEPEJEOA',
+  '에테르넬 나이트팬츠': BASE+'KEPEJFGE', '트릭스터 레인져팬츠': BASE+'KEPEJGIG', '에테르넬 아처팬츠': BASE+'KEPEJFGG',
+  '트릭스터 어새신팬츠': BASE+'KEPEJGIJ', '에테르넬 시프팬츠': BASE+'KEPEJFGJ',
+  '트릭스터 던위치팬츠': BASE+'KEPEJGIH', '에테르넬 메이지팬츠': BASE+'KEPEJFGH',
+  '트릭스터 원더러팬츠': BASE+'KEPEJGII', '에테르넬 파이렛팬츠': BASE+'KEPEJFGI',
+  // 장갑
+  '앱솔랩스 나이트글러브': BASE+'KEPKJBNH', '도전자의 장갑': BASE+'KEPKJPPG',
+  '아케인셰이드 나이트글러브': BASE+'KEPKJBHE', '에테르넬 나이트글러브': BASE+'KEPKJAIB',
+  // 신발
+  '앱솔랩스 나이트슈즈': BASE+'KEPFIHNB', '도전자의 신발': BASE+'KEPFIONH',
+  '아케인셰이드 나이트슈즈': BASE+'KEPFIGLJ', '에테르넬 나이트슈즈': BASE+'KEPFIBMI',
+  // 망토
+  '앱솔랩스 나이트케이프': BASE+'KEOCJAJE', '도전자의 망토': BASE+'KEOCIAMJ',
+  '아케인셰이드 나이트케이프': BASE+'KEOCJOKB', '에테르넬 나이트케이프': BASE+'KEOCIDNC',
+  // 어깨장식
+  '마이스터 숄더': BASE+'KEOHJGLF', '도전자의 어깨장식': BASE+'KEOHJFMJ',
+  '앱솔랩스 나이트숄더': BASE+'KEOHJGJJ', '아케인셰이드 나이트숄더': BASE+'KEOHJGHH', '에테르넬 나이트숄더': BASE+'KEOHJFPD',
+  // 벨트
+  '타일런트 히아데스 벨트': BASE+'KEOBJGJE', '골든 클로버 벨트': BASE+'KEOBJFJD',
+  '분노한 자쿰의 벨트': BASE+'KEOBJFHH', '몽환의 벨트': BASE+'KEOBJEOJ',
+  // 귀고리
+  '데아 시두스 이어링': BASE+'KEPBJFKA', '마이스터 이어링': BASE+'KEPBJFOB',
+  '오션 글로우 이어링': BASE+'KEPBJFND', '에스텔라 이어링': BASE+'KEPBJENB', '커맨더 포스 이어링': BASE+'KEPBJEPH',
+  // 얼굴장식
+  '트와일라이트 마크': BASE+'KEPDJALG', '루즈 컨트롤 머신 마크': BASE+'KEPDJBND', '오만의 원죄': '/reward/bright_boss_face_acc.png',
+  // 눈장식
+  '블랙빈 마크': BASE+'KEPAJFND', '파풀라투스 마크': BASE+'KEPAJFJG', '마력이 깃든 안대': BASE+'KEPAJFJJ',
+  // 펜던트
+  '핑크 펜던트(직업)': BASE+'KEOAJHHJ', '퍼플 펜던트(직업)': BASE+'KEOAJHHJ',
+  '매커네이터 펜던트': BASE+'KEOAJFLF', '리퍼펜던트': BASESEA+'KEOAJFHH',
+  '프론티어C': BASESEA+'KEOAJFLJ', '프론티어B': BASESEA+'KEOAJFLG',
+  '도미네이터 펜던트': BASE+'KEOAJGLB', '데이브레이크 펜던트': BASE+'KEOAJDKC',
+  '고통의 근원': BASE+'KEOAJDNB', '죽음의 맹세': '/item/deathOath.png',
+  // 반지
+  '이터널 플레임 링': BASE+'KEODPEMF', '어웨이크 링': BASE+'KEODPEPJ',
+  '테네브리스 원정대 반지': BASE+'KEODPEOG', '글로리온 링 : 슈프림': BASE+'KEODPEPH',
+  '헤카톤반지': BASESEA+'KEODIGKH', '마이스터링': BASE+'KEODIHLE',
+  '무적반지': BASESEA+'KEODIFII', '칸나반지': BASESEA+'KEODIGLE', '듄켈반지': BASESEA+'KEODIEOD',
+  '가디언 엔젤 링': BASE+'KEODIEPH', '여명의 가디언 엔젤 링': BASE+'KEODIEPH',
+  '거대한 공포': BASE+'KEODIEOH', '근원의 속삭임': BASE+'KEODIEKA', '황홀한 악몽': '/reward/bright_boss_ring2.png',
+  // 기계 심장
+  '티타늄 하트': BASE+'KEJFJHKB', '페어리 하트': BASE+'KEJFJHJI', '150제 하트': BASESEA+'KEJFJHII',
+  '블랙 하트': BASE+'KEJFJHJH', '플라즈마 하트': BASE+'KEJFJHHI', '컴플리트 언더컨트롤': BASE+'KEJFJHHE',
+  // 포켓 아이템
+  '핑크빛 성배': BASE+'KEOEJHME', '저주받은 적의 마도서': BASE+'KEOEJHGB',
+  // 뱃지
+  '창세의 뱃지': BASE+'KEOKJFGE', '칠요의 뱃지': BASE+'KEOKJFOB',
+  // 훈장
+  '본 투 비 레드': BASE+'KEOGIFOC', '칠요의 몬스터파커': BASE+'KEOGJOMD', '불멸의 유산': '/reward/bright_boss_merit.png',
+  // 무기
+  '도전자의 리벤지가즈': BASE+'KELFJFGG', '아케인셰이드 가즈': BASE+'KELFJFIE', '제네시스 가즈': BASE+'KELFJFJE',
+  '도전자의 피어싱스피어': BASE+'KELBJFNI', '도전자의 핼버드': BASE+'KELGJFHH',
+  '아케인셰이드 스피어': BASE+'KELBJFPJ', '아케인셰이드 폴암': BASE+'KELGJFJF',
+  '제네시스 스피어': BASE+'KELBJFMG', '제네시스 폴암': BASE+'KELGJFGE',
+  '데스티니 스피어': './destiny/destiny21.png', '데스티니 폴암': './destiny/destiny22.png',
+  '도전자의 비트해머': BASE+'KEMAJFJJ', '도전자의 엑스': BASE+'KEMDJFME',
+  '아케인셰이드 해머': BASE+'KEMAJFLE', '아케인셰이드 엑스': BASE+'KEMDJFOC',
+  '제네시스 해머': BASE+'KEMAJFIF', '제네시스 엑스': BASE+'KEMDJFPC',
+  '데스티니 해머': './destiny/destiny12.png', '데스티니 엑스': './destiny/destiny11.png',
+  '도전자의 데스페라도': BASE+'KENBJGNF', '아케인셰이드 데스페라도': BASE+'KENBJGPC', '제네시스 데스페라도': BASE+'KENBJGMD', '데스티니 데스페라도': './destiny/destiny04.png',
+  '도전자의 슬래셔': BASE+'KEMBJEOD', '아케인셰이드 대거': BASE+'KEMBJFJI', '제네시스 대거': BASE+'KEMBJFGI', '데스티니 대거': './destiny/destiny13.png',
+  '도전자의 스펠링완드': BASE+'KEMFJFLB', '아케인셰이드 완드': BASE+'KEMFJFMJ', '제네시스 완드': BASE+'KEMFJFNG', '데스티니 완드': './destiny/destiny15.png',
+  '도전자의 폭검': BASE+'KENDOHMB', '아케인셰이드 환검': BASE+'KENDOHMD', '제네시스 창세검': BASE+'KENDOHMF', '데스티니 초극검': './destiny/destiny47.png',
+  '도전자의 샤이닝로드': BASE+'KENDJGKA', '아케인셰이드 샤이닝로드': BASE+'KENDJGMB', '제네시스 샤이닝로드': BASE+'KENDJGMI', '데스티니 샤이닝로드': './destiny/destiny00.png',
+  '도전자의 듀얼보우건': BASE+'KEKAJGIC', '아케인셰이드 듀얼보우건': BASE+'KEKAJGKC', '제네시스 듀얼보우건': BASE+'KEKAJGLD', '데스티니 듀얼보우건': './destiny/destiny28.png',
+  '도전자의 포인팅건': BASE+'KELLJFLJ', '아케인셰이드 피스톨': BASE+'KELLJFNE', '제네시스 피스톨': BASE+'KELLJFKE', '데스티니 피스톨': './destiny/destiny27.png',
+  '도전자의 세이버': BASE+'KEMCJEJD', '아케인셰이드 세이버': BASE+'KEMCJEKC', '제네시스 세이버': BASE+'KEMCJELE', '데스티니 세이버': './destiny/destiny10.png',
+  '도전자의 블로우너클': BASE+'KELKJFKF', '아케인셰이드 클로': BASE+'KELKJFMA', '제네시스 클로': BASE+'KELKJFND', '데스티니 클로': './destiny/destiny26.png',
+  '도전자의 스펠링스태프': BASE+'KEMKJFGH', '아케인셰이드 스태프': BASE+'KEMKJFIE', '제네시스 스태프': BASE+'KEMKJFJF', '데스티니 스태프': './destiny/destiny16.png',
+  '도전자의 슈팅보우': BASE+'KELHJFGF', '아케인셰이드 보우': BASE+'KELHJFLG', '제네시스 보우': BASE+'KELHJFIH', '데스티니 보우': './destiny/destiny23.png',
+  '도전자의 파일 갓': BASE+'KEKKJHLG', '아케인셰이드 엘라하': BASE+'KEKKJHMC', '제네시스 엘라하': BASE+'KEKKJHKF', '데스티니 엘라하': './destiny/destiny32.png',
+  '도전자의 브로드세이버': BASE+'KELCJFGI', '아케인셰이드 투핸드소드': BASE+'KELCJFLI', '제네시스 투핸드소드': BASE+'KELCJFIJ', '데스티니 투핸드소드': './destiny/destiny17.png',
+  '도전자의 크로스보우': BASE+'KELEJFIG', '아케인셰이드 크로스보우': BASE+'KELEJFKC', '제네시스 크로스보우': BASE+'KELEJFLD', '데스티니 크로스보우': './destiny/destiny24.png',
+  '도전자의 튜너': BASE+'KENDIHLD', '아케인셰이드 튜너': BASE+'KENDIHPJ', '제네시스 튜너': BASE+'KENDIHMD', '데스티니 튜너': './destiny/destiny01.png',
+  '도전자의 소울슈터': BASE+'KENAJGNF', '아케인셰이드 소울슈터': BASE+'KENAJGPC', '제네시스 소울슈터': BASE+'KENAJGMD', '데스티니 소울슈터': './destiny/destiny03.png',
+  '도전자의 매직 건틀렛': BASE+'KENKJHLC', '아케인셰이드 매직 건틀렛': BASE+'KENKJHPG', '제네시스 매직 건틀렛': BASE+'KENKJHKB', '데스티니 매직건틀릿': './destiny/destiny08.png',
+  '도전자의 에너지소드': BASE+'KENGJGLI', '아케인셰이드 에너지체인': BASE+'KENGJGMD', '제네시스 에너지체인': BASE+'KENGJGKA', '데스티니 에너지체인': './destiny/destiny05.png',
+  '라즐리 9형': BASE+'KEKFJHOI', '라피스 9형': BASE+'KEKEJHOI', '제네시스 라즐리': BASE+'KEKFJHPB', '제네시스 라피스': BASE+'KEKEJHPB', '데스티니 라즐리': './destiny/destiny31.png', '데스티니 라피스': './destiny/destiny30.png',
+  '도전자의 체인': BASE+'KENFJHLC', '아케인셰이드 체인': BASE+'KENFJHPG', '제네시스 체인': BASE+'KENFJHKB', '데스티니 체인': './destiny/destiny07.png',
+  '도전자의 브레스 슈터': BASE+'KENDPHKJ', '아케인셰이드 브레스 슈터': BASE+'KENDPHPJ', '제네시스 브레스 슈터': BASE+'KENDPHMD', '데스티니 브레스 슈터': './destiny/destiny02.png',
+  '도전자의 차크람': BASE+'KELCPHKE', '아케인셰이드 차크람': BASE+'KELCPHPJ', '제네시스 이클립스': BASE+'KELCPHMD', '데스티니 차크람': './destiny/destiny18.png',
+  '도전자의 블래스트캐논': BASE+'KEKBJGII', '아케인셰이드 시즈건': BASE+'KEKBJGLB', '제네시스 시즈건': BASE+'KEKBJGLG', '데스티니 블래스트캐논': './destiny/destiny29.png',
+  '도전자의 ESP리미터': BASE+'KENEJHIF', '아케인셰이드 ESP리미터': BASE+'KENEJHNI', '제네시스 ESP리미터': BASE+'KENEJHLA', '데스티니 ESP리미터': './destiny/destiny06.png',
+  '도전자의 브로드해머': BASE+'KELAJFOG', '아케인셰이드 투핸드해머': BASE+'KELAJGGI', '제네시스 투핸드해머': BASE+'KELAJGHG', '데스티니 투핸드해머': './destiny/destiny20.png',
+  '도전자의 에인션트 보우': BASE+'KEKLJHKJ', '아케인셰이드 에인션트 보우': BASE+'KEKLJHMB', '제네시스 에인션트 보우': BASE+'KEKLJHMD', '데스티니 에인션트 보우': './destiny/destiny33.png',
+  '도전자의 핀쳐케인': BASE+'KEMEJGIB', '아케인셰이드 케인': BASE+'KEMEJGKB', '제네시스 케인': BASE+'KEMEJGKI', '데스티니 케인': './destiny/destiny14.png',
+  '도전자의 괴선': BASE+'KENLJHKI', '아케인셰이드 초선': BASE+'KENLJHPJ', '제네시스 창세선': BASE+'KENLJHMD', '데스티니 초월선': './destiny/destiny09.png',
+  // 보조무기
+  '파사부': BASE+'KEMHJFHD', '아스트라 탈리스만': '/astra/astra_01.png', '에레브의 광휘': BASE+'KEMHJOJD', '아스트라 옵시디언': '/astra/astra_02.png',
+  '버서크 체인': BASE+'KEMHJFMD', '아스트라 체인': '/astra/astra_03.png',
+  '극한의 포스실드': BASE+'KEPLCHOF', '루인 포스실드': BASE+'KEPLCHPE', '아스트라 포스실드': '/astra/astra_04.png',
+  '아케인셰이드 블레이드': BASE+'KEMGJGOF', '아스트라 블레이드': '/astra/astra_05.png',
+  '빛나는 사옥 노리개': BASE+'KEMHPHMC', '아스트라 사옥 노리개': '/astra/astra_06.png',
+  '자색 여의보주': '/item/lenSW.png', '아스트라 여의보주': '/astra/astra_07.png',
+  '카르마 오브': BASE+'KEMHJDOC', '아스트라 오브': '/astra/astra_08.png',
+  '무한의 마법 화살': BASE+'KEMHJHOC', '아스트라 마법 화살': '/astra/astra_09.png',
+  '이터널 매그넘': BASE+'KEMHJAOC', '아스트라 매그넘': '/astra/astra_10.png',
+  '정의의 소울실드': BASE+'KEPLDHOC', '아스트라 소울실드': '/astra/astra_11.png',
+  '리스트 아머': BASE+'KEMHJOOD', '아스트라 리스트 밴드': '/astra/astra_12.png',
+  '맥시마이즈 볼': BASE+'KEMHJOLD', '아스트라 엄브럴 실드': '/astra/astra_13.png',
+  '블라스트 페더': BASE+'KEMHJFID', '아스트라 페더': '/astra/astra_14.png',
+  '익스플로시브 필<3호>': BASE+'KEMHIDOC', '아스트라 익스플로시브 필': '/astra/astra_15.png',
+  '백금의 서 <종장>': BASE+'KEMHJFLD', '아스트라 아케인 실드': '/astra/astra_16.png',
+  '슬래싱 섀도우': BASE+'KEMHJFGD', '아스트라 베인 실드': '/astra/astra_17.png',
+  '전발적중': BASE+'KEMHJFJD', '아스트라 불스아이': '/astra/astra_20.png',
+  '노블 브레이슬릿': BASE+'KEMHPHOC', '아스트라 브레이슬릿': '/astra/astra_21.png',
+  '천룡추': BASE+'KEMHJOND', '아스트라 백호추': '/astra/astra_22.png',
+  '얼티밋 패스': BASE+'KEMHIBOC', '아스트라 패스': '/astra/astra_23.png',
+  '적녹의 서 <종장>': BASE+'KEMHJFND', '청은의 서 <종장>': BASE+'KEMHJFKD', '드래곤마스터의 유산': BASE+'KEMHJOKD',
+  '아스트라 프로미넌트 실드': '/astra/astra_24.png',
+  '그린 소울링': BASE+'KEMHJBOF', '아스트라 소울링': '/astra/astra_25.png',
+  '와일드 팡': BASE+'KEMHJOIC', '아스트라 와일드 터스크': '/astra/astra_26.png',
+  '황금빛 여우구슬': BASE+'KEMHIGOC', '아스트라 여우구슬': '/astra/astra_28.png',
+  '글로리 매직윙': BASE+'KEMHICOC', '아스트라 매직윙': '/astra/astra_29.png',
+  '옥타코어 컨트롤러': BASE+'KEMHIHOF', '아스트라 데카코어 컨트롤러': '/astra/astra_30.png', '아스트라 아워글라스': '/astra/astra_31.png',
+  '트랜스미터 type:A': BASE+'KEMHIEOC', '아스트라 트랜스미터': '/astra/astra_32.png',
+  '진리의 노바의 정수': BASE+'KEMHJCOC', '아스트라 노바의 정수': '/astra/astra_33.png',
+  'D100 커스텀 웨폰 벨트': BASE+'KEMHPPHPC', '아스트라 웨폰 벨트': '/astra/astra_34.png',
+  '인피니트 헥스시커': BASE+'KEMHPHNC', '아스트라 헥스시커': '/astra/astra_35.png',
+  '봄버드 센터파이어': BASE+'KEMHJOMD', '아스트라 림리스': '/astra/astra_36.png',
+  '팔콘아이': BASE+'KEMHJOPD', '아스트라 레이븐아이': '/astra/astra_37.png',
+  '체스피스 디 퀸': BASE+'KEMHIFOC', '아스트라 체스피스 디 킹': '/astra/astra_38.png',
+  '세이크리드 로자리오': BASE+'KEMHJFPD', '아스트라 로자리오': '/astra/astra_39.png',
+  '퍼펙트 렐릭': BASE+'KEMHIAOC', '아스트라 렐릭': '/astra/astra_40.png',
+  '데르니에 카르트': BASE+'KEMHJGOC', '아스트라 카르트': '/astra/astra_41.png',
+  '월장석 선추': BASE+'KEMHIPOC', '아스트라 금강석 선추': '/astra/astra_43.png',
+  '버츄스 메달': BASE+'KEMHJFOD', '아스트라 메달': '/astra/astra_44.png',
+  // 엠블렘
+  '미트라의 분노 : 도적': BASE+'KEOLLCLJ', '미트라의 분노 : 전사': BASE+'KEOLLCLE',
+  '미트라의 분노 : 마법사': BASE+'KEOLLCLG', '미트라의 분노 : 궁수': BASE+'KEOLLCLH', '미트라의 분노 : 해적': BASE+'KEOLLCLI',
+  '골드 메이플리프 엠블렘': BASE+'KEOLLEOA', '골드 데몬 엠블렘': BASE+'KEOLLAOA', '골드 시그너스 엠블렘': BASE+'KEOLLPOA',
+  '금빛 풍수사 엠블렘': BASE+'KEOLLCIA', '금빛 검수 엠블렘': '/item/lenEm.png', '골드 히어로즈 엠블렘': BASE+'KEOLLCMA',
+  '골드 레지스탕스 엠블렘': BASE+'KEOLLBOA', '골드 나이트 엠블렘': BASE+'KEOLLCLD', '골드 어비스 엠블렘': BASE+'KEOLLCKB',
+  '엔젤 엠블렘': BASE+'KEOLLGOA', '골드 크리스탈 엠블렘': BASE+'KEOLLCND', '이터널 타임 엠블렘': BASE+'KEOLLOOB',
+  '골드 에이전트 엠블렘': BASE+'KEOLLCNB', '드래곤 엠블렘': BASE+'KEOLLHOA',
+  '골드 키네시스 엠블렘': BASE+'KEOLKHOA', '금빛 천지인 엠블렘': BASE+'KEOLLCLB',
+  '하이브리드 하트': BASE+'KEOLLFOA', '골드 체이서 엠블렘': BASE+'KEOLLCIC',
+};
+
+function getIconUrlMap() {
+  return ICON_MAP;
+}
+
+function resolveIconUrl(name, map) {
+  if (map[name]) return map[name];
+  const TIERS = ['앱솔랩스', '아케인셰이드', '에테르넬'];
+  const tier = TIERS.find(t => name.includes(t));
+  if (tier) {
+    if (name.includes('장갑')) return map[`${tier} 나이트글러브`] || '';
+    if (name.includes('신발')) return map[`${tier} 나이트슈즈`] || '';
+    if (name.includes('망토')) return map[`${tier} 나이트케이프`] || '';
+    if (name.includes('어깨')) return map[`${tier} 나이트숄더`] || '';
+  }
+  if (name.includes('타일런트') && name.includes('벨트')) return map['타일런트 히아데스 벨트'] || '';
+  if (name.includes('핑크 펜던트')) return map['핑크 펜던트(직업)'] || '';
+  if (name.includes('퍼플 펜던트')) return map['퍼플 펜던트(직업)'] || '';
+  return '';
+}
+
 // ─── Firebase 사용량 카운터 ────────────────────────────────
 const FIREBASE_PROJECT = 'maplescouter-ocr';
 const COUNTER_DOC = `projects/${FIREBASE_PROJECT}/databases/(default)/documents/stats/counter`;
@@ -682,6 +859,7 @@ document.getElementById('btnOcrSubmit')?.addEventListener('click', async (e) => 
     const item = buildItemFromOcrResult();
     if (!item.name) throw new Error('아이템 이름이 없습니다.');
     if (!item.slot) throw new Error('부위가 없습니다.');
+    item.iconUrl = resolveIconUrl(item.name, getIconUrlMap());
     const res = await addBookmarkToPage(item);
 
     if (res.success) { showToast(res.message, 'success'); closeViewerWindow(); }
@@ -756,6 +934,10 @@ if (chkAutoUpdate) {
 
 document.getElementById('btnDismissUpdate')?.addEventListener('click', () => {
   document.getElementById('updateBanner').style.display = 'none';
+});
+
+document.getElementById('btnWarningConfirm')?.addEventListener('click', () => {
+  document.getElementById('warningOverlay').classList.add('hidden');
 });
 
 // ─── 설정 백업 / 복원 ─────────────────────────────────────

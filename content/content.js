@@ -1,7 +1,3 @@
-// content/content.js
-// maplescouter.com 페이지에서 실행되는 스크립트
-// popup에서 메시지를 받아 localStorage에 아이템을 추가합니다.
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'addBookmark') {
     try {
