@@ -1,4 +1,4 @@
-# 메이플 북마크 추가기 with Gemini - Chrome 확장 프로그램
+# 환산 아이템 추가 프로그램 - Chrome 확장 프로그램
 
 메이플스토리 아이템 툴팁 스크린샷을 Gemini AI로 OCR 분석하여 maplescouter.com의 북마크(`equipBookmarkList`)에 자동으로 추가하는 Chrome 확장 프로그램입니다.
 

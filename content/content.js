@@ -1,4 +1,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (sender.id !== chrome.runtime.id) return;
+
   if (request.action === 'addBookmark') {
     try {
       const newItem = request.item;

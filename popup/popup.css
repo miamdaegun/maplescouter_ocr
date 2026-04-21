@@ -22,7 +22,7 @@
   --success: #4ecdc4;
   --error: #ff6b6b;
   --radius: 8px;
-  --font: 'Noto Sans KR', sans-serif;
+  --font: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
 }
 
 body {
@@ -555,6 +555,22 @@ input::placeholder { color: var(--text-muted); opacity: 0.6; }
 }
 
 .bookmark-item:hover { border-color: var(--accent); }
+
+.bookmark-delete-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+}
+.bookmark-item:hover .bookmark-delete-btn { opacity: 1; }
+.bookmark-delete-btn:hover { color: var(--error); }
 
 .bookmark-item-icon {
   width: 32px;

@@ -176,30 +176,13 @@ function resolveIconUrl(name, map) {
 }
 
 // ─── Firebase 사용량 카운터 ────────────────────────────────
-const FIREBASE_PROJECT = 'maplescouter-ocr';
-const COUNTER_DOC = `projects/${FIREBASE_PROJECT}/databases/(default)/documents/stats/counter`;
+const FIREBASE_PROJECT = '';
+const COUNTER_DOC = '';
 
-async function trackApiCall() {
-  try {
-    await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents:commit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        writes: [{
-          transform: {
-            document: COUNTER_DOC,
-            fieldTransforms: [{
-              fieldPath: 'count',
-              increment: { integerValue: '1' }
-            }]
-          }
-        }]
-      })
-    });
-  } catch (_) {
-    // 카운팅 실패는 사용자 경험에 영향 없이 무시
-  }
-}
+// ─── 원격 킬스위치 ────────────────────────────────────────
+async function checkKillSwitch(){}
+
+async function trackApiCall(){}
 
 // ─── 탭 전환 ─────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach((tab) => {
@@ -265,6 +248,21 @@ async function addBookmarkToPage(item) {
   }, [item]);
 }
 
+async function removeBookmarkFromPage(index) {
+  return execInPage((idx) => {
+    try {
+      const raw = localStorage.getItem('equipBookmarkList');
+      const current = raw ? JSON.parse(raw) : { state: { bookmarkList: [] }, version: 0 };
+      if (!current.state?.bookmarkList) return { success: false };
+      current.state.bookmarkList.splice(idx, 1);
+      localStorage.setItem('equipBookmarkList', JSON.stringify(current));
+      return { success: true };
+    } catch (e) {
+      return { success: false };
+    }
+  }, [index]);
+}
+
 async function getBookmarkListFromPage() {
   return execInPage(() => {
     try {
@@ -296,7 +294,7 @@ async function loadBookmarkList() {
       return;
     }
 
-    listEl.innerHTML = list.map((item) => {
+    listEl.innerHTML = list.map((item, i) => {
       const grade = item.potential_grade || '';
       const badgeClass = grade ? `grade-${grade}` : '';
       return `
@@ -307,9 +305,19 @@ async function loadBookmarkList() {
             <div class="bookmark-item-meta">${item.slot} · ★${item.starforce || 0}</div>
           </div>
           ${grade ? `<span class="grade-badge ${badgeClass}">${grade}</span>` : ''}
+          <button class="bookmark-delete-btn" data-index="${i}" title="삭제">✕</button>
         </div>
       `;
     }).join('');
+
+    listEl.querySelectorAll('.bookmark-delete-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.dataset.index);
+        await removeBookmarkFromPage(idx);
+        loadBookmarkList();
+      });
+    });
   } catch (e) {
     listEl.innerHTML = `<div class="empty-state">오류: ${e.message}</div>`;
   }
@@ -335,9 +343,15 @@ const MAX_QUOTA = {
   'gemini-3.1-flash-lite-preview': 500
 };
 
+let cachedApiKey = '';
+
+async function loadApiKey() {
+  const result = await chrome.storage.local.get('maple_gemini_api_key');
+  cachedApiKey = result.maple_gemini_api_key || '';
+}
+
 function getKeyId() {
-  const key = localStorage.getItem('maple_gemini_api_key') || '';
-  return key ? key.slice(-8) : 'nokey';
+  return cachedApiKey ? cachedApiKey.slice(-8) : 'nokey';
 }
 
 function quotaKey(model) {
@@ -393,10 +407,9 @@ function increaseUsedQuota(modelName) {
 // 설정 및 상태 복구
 // ═══════════════════════════════════════════════════════════
 function loadSettings() {
-  const key = localStorage.getItem('maple_gemini_api_key') || '';
   const input = document.getElementById('visionApiKey');
-  if (input && key) {
-    input.value = key;
+  if (input && cachedApiKey) {
+    input.value = cachedApiKey;
     setApiKeyStatus('✓ 저장된 키 로드됨', 'ok');
   }
 
@@ -420,7 +433,8 @@ document.getElementById('btnSaveKey')?.addEventListener('click', () => {
   if (!key) { setApiKeyStatus('키를 입력해주세요', 'err'); return; }
   if (!key.startsWith('AIza')) { setApiKeyStatus('⚠ 형식이 올바르지 않습니다 (AIza...)', 'err'); return; }
   
-  localStorage.setItem('maple_gemini_api_key', key);
+  cachedApiKey = key;
+  chrome.storage.local.set({ 'maple_gemini_api_key': key });
   setApiKeyStatus('✓ 저장 완료', 'ok');
   initAndCheckQuota();
 });
@@ -717,7 +731,6 @@ async function runGeminiVision(base64Image, mediaType, apiKey) {
 
   const data = await response.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-  console.log('[Gemini Raw Response]', text);
   const parsed = JSON.parse(text);
 
   if (parsed.exceptionalOption) { parsed.exceptionalOption.exceptional_upgrade = parseInt(parsed.exceptionalOption.exceptional_upgrade) || 0; }
@@ -791,7 +804,7 @@ function buildItemFromOcrResult() {
 
 // ─── 버튼 리스너 ───────────────────────────────────────────
 document.getElementById('btnRunOcr')?.addEventListener('click', async () => {
-  const apiKey = localStorage.getItem('maple_gemini_api_key') || document.getElementById('visionApiKey').value.trim();
+  const apiKey = cachedApiKey || document.getElementById('visionApiKey').value.trim();
   if (!apiKey) { showToast('Gemini API 키를 먼저 저장해주세요', 'error'); return; }
   if (!currentImageBase64) { showToast('이미지를 먼저 업로드해주세요', 'error'); return; }
 
@@ -936,9 +949,6 @@ document.getElementById('btnDismissUpdate')?.addEventListener('click', () => {
   document.getElementById('updateBanner').style.display = 'none';
 });
 
-document.getElementById('btnWarningConfirm')?.addEventListener('click', () => {
-  document.getElementById('warningOverlay').classList.add('hidden');
-});
 
 // ─── 설정 백업 / 복원 ─────────────────────────────────────
 const BACKUP_DEFAULTS = {
@@ -949,10 +959,10 @@ const BACKUP_DEFAULTS = {
   'maple_custom_prompt': '',
 };
 
-document.getElementById('btnExportSettings')?.addEventListener('click', () => {
+document.getElementById('btnExportSettings')?.addEventListener('click', async () => {
   const settings = {};
   Object.entries(BACKUP_DEFAULTS).forEach(([k, defaultVal]) => {
-    settings[k] = localStorage.getItem(k) ?? defaultVal;
+    settings[k] = k === 'maple_gemini_api_key' ? (cachedApiKey || defaultVal) : (localStorage.getItem(k) ?? defaultVal);
   });
 
   const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
@@ -978,7 +988,13 @@ document.getElementById('importFileInput')?.addEventListener('change', (e) => {
     try {
       const settings = JSON.parse(ev.target.result);
       Object.keys(BACKUP_DEFAULTS).forEach(k => {
-        if (settings[k] !== undefined) localStorage.setItem(k, settings[k]);
+        if (settings[k] === undefined) return;
+        if (k === 'maple_gemini_api_key') {
+          cachedApiKey = settings[k];
+          chrome.storage.local.set({ 'maple_gemini_api_key': settings[k] });
+        } else {
+          localStorage.setItem(k, settings[k]);
+        }
       });
       loadSettings();
       showToast('설정이 복원되었습니다.', 'success');
@@ -991,7 +1007,12 @@ document.getElementById('importFileInput')?.addEventListener('change', (e) => {
 });
 
 // ─── 초기 구동 ─────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadApiKey();
+  await checkKillSwitch();
+  document.getElementById('btnWarningConfirm')?.addEventListener('click', () => {
+    document.getElementById('warningOverlay').style.display = 'none';
+  });
   checkPageStatus();
   loadSettings();
   loadSavedOcrState();

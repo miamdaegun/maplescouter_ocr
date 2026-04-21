@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>개인정보 처리방침 - 환산 아이템 추가 프로그램</title>
+  <style>
+    body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.8; }
+    h1 { font-size: 20px; border-bottom: 2px solid #333; padding-bottom: 8px; }
+    h2 { font-size: 15px; margin-top: 28px; }
+    p, li { font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>개인정보 처리방침</h1>
+  <p>환산 아이템 추가 프로그램(이하 "확장 프로그램")는 사용자의 개인정보를 소중히 여깁니다.</p>
+
+  <h2>수집하는 정보</h2>
+  <ul>
+    <li><strong>Gemini API 키</strong>: 사용자가 직접 입력한 키를 기기 내 chrome.storage.local에만 저장하며, 외부 서버로 전송되지 않습니다.</li>
+    <li><strong>API 사용 횟수</strong>: 무료 할당량 관리를 위해 총 호출 횟수를 Firebase(Firestore)에 익명으로 기록합니다. 이 데이터는 특정 사용자를 식별하지 않습니다.</li>
+    <li><strong>아이템 이미지</strong>: OCR 분석을 위해 업로드한 이미지는 Google Gemini API로 전송됩니다. 이미지는 서버에 저장되지 않으며 분석 후 즉시 파기됩니다.</li>
+  </ul>
+
+  <h2>수집하지 않는 정보</h2>
+  <ul>
+    <li>이름, 이메일 등 개인 식별 정보</li>
+    <li>브라우저 히스토리, 위치 정보</li>
+    <li>API 키 외의 계정 정보</li>
+  </ul>
+
+  <h2>제3자 서비스</h2>
+  <ul>
+    <li><strong>Google Gemini API</strong>: 이미지 분석에 사용됩니다. <a href="https://policies.google.com/privacy" target="_blank">Google 개인정보 처리방침</a>이 적용됩니다.</li>
+    <li><strong>Firebase (Firestore)</strong>: 익명 사용 통계 저장에 사용됩니다. <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase 개인정보 처리방침</a>이 적용됩니다.</li>
+  </ul>
+
+  <h2>문의</h2>
+  <p>개인정보 관련 문의: <a href="mailto:miamdaegun@gmail.com">miamdaegun@gmail.com</a></p>
+  <p style="color:#888; font-size:12px; margin-top:40px;">최종 수정일: 2025년 4월</p>
+</body>
+</html>
